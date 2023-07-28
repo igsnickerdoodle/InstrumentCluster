@@ -1,9 +1,13 @@
+# Needed imports for functioning instrument cluster
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import sys
 
-from components.tachometer import Tachometer
+## Module Imports
+from .components import Tachometer
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,8 +33,7 @@ class MainWindow(QMainWindow):
         self.tachometer.setAttribute(Qt.WA_TranslucentBackground, True)
 
         # Add widgets to layout at specific grid locations
-        layout.addWidget(self.tachometer, 1, 0, 1, 2)  # Grid (row=1, col=0, rowspan=1, colspan=2)
-        
+        layout.addWidget(self.tachometer, 1, 0, 1, 2)  # Grid (row=1, col=0, rowspan=1, colspan=2)       
     def paintEvent(self, event):
         pass
 
