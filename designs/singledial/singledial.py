@@ -4,8 +4,10 @@ from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize, QTimer
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics, QRadialGradient, QBrush
 import math, sys
 
+sys.path.append('C:/Users/caleb/Documents/Gitlab/InstrumentCluster')
 # Module import
-from ...components import arduino_serial
+#from ...components import arduino
+from components.arduino import arduino_serial
 
 global_x = 280
 global_y = 50
@@ -14,7 +16,7 @@ class Tachometer(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.arduino = arduino_serial       
+        self.arduino = arduino_serial    
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_values)

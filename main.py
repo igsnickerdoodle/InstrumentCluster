@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 import sys
 
 ## Module Imports
-from .components import Tachometer
+from designs.singledial import singledial
 
 
 
@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         layout = QGridLayout(label)
 
         # Create the Tachometer and Speedometer instances with transparent backgrounds
-        self.tachometer = Tachometer()
+        self.tachometer = singledial()
 
         self.tachometer.setAttribute(Qt.WA_TranslucentBackground, True)
 
