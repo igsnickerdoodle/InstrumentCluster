@@ -26,7 +26,6 @@ void setup() {
 }
 
 void loop() {
-  // Check for start or stop signal from Serial
   while (Serial.available()) {
     String command = Serial.readString();
     if (command.startsWith("START")) {
@@ -38,7 +37,7 @@ void loop() {
   }
 
   if (!isRunning) {
-    return;  // If isRunning is false, exit the loop
+    return; 
   }
 
   StaticJsonDocument<200> doc;
@@ -70,7 +69,7 @@ void loop() {
   
   float RPM;
   if (pulseTime(100000, RPM)) {
-    doc["RPM"] = (int)RPM / 2;  // Cast to int to exclude decimals
+    doc["RPM"] = (int)RPM / 2; 
   }
 
   serializeJson(doc, Serial);
@@ -81,7 +80,7 @@ boolean pulseTime (unsigned long duration, float& RPM) {
   static int lastInput = digitalRead(inPin);
   static unsigned long start = micros(), lastEventTime = start ; 
   static long count = -1 ; 
-  if ((micros() - start) < duration) {           // measure
+  if ((micros() - start) < duration) {   
     if (lastInput != digitalRead(inPin)) {
       lastInput = digitalRead(inPin);
       if (lastInput) {

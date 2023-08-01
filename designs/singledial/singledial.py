@@ -3,11 +3,9 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication, QMainWindow, QSt
 from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize, QTimer
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics, QRadialGradient, QBrush
 import math, sys
-
-sys.path.append('C:/Users/caleb/Documents/Gitlab/InstrumentCluster')
 # Module import
 #from ...components import arduino
-from components.arduino import arduino_serial
+from components.arduino.arduino_serial import arduino
 
 global_x = 280
 global_y = 50
@@ -16,7 +14,7 @@ class Tachometer(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.arduino = arduino_serial    
+        self.arduino = arduino 
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_values)
@@ -460,7 +458,7 @@ class Tachometer(QWidget):
         angle_range = abs(end_angle - start_angle)
         needle_angle = center_angle + (self.rpm / 8000) * angle_range
 
-        pixmap = QPixmap('/srv/pyapp/resources/rpmneedle.png')
+        pixmap = QPixmap('InstrumentCluster/resources/rpmneedle.png')
         
 
         # Resize the pixmap
@@ -854,7 +852,7 @@ class Tachometer(QWidget):
             self.indicator_light_cel.clear()
             self.cel_on = False
         else:
-            pixmap = QPixmap('/srv/pyapp/resources/cel.png')
+            pixmap = QPixmap('InstrumentCluster/resources/cel.png')
             pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_cel.setPixmap(pixmap)
             self.cel_on = True
@@ -866,7 +864,7 @@ class Tachometer(QWidget):
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
         else:
-            pixmap = QPixmap('/srv/pyapp/resources/High_Beam.png')
+            pixmap = QPixmap('InstrumentCluster/resources/High_Beam.png')
             pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_highbeams.setPixmap(pixmap)
             self.highbeams_on = True
@@ -878,7 +876,7 @@ class Tachometer(QWidget):
             self.indicator_light_foglights.clear()
             self.foglights_on = False
         else:
-            pixmap = QPixmap('/srv/pyapp/resources/Fog_light.png')
+            pixmap = QPixmap('InstrumentCluster/resources/Fog_light.png')
             pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_foglights.setPixmap(pixmap)
             self.foglights_on = True

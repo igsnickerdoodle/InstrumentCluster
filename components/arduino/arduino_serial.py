@@ -46,7 +46,7 @@ class ArduinoSerial:
 # For Windows check Device Manager. It will be a COM port
 # For Linux please check /dev/ and dmesg
 
-arduino = ArduinoSerial('/dev/ttyACM0', 115200)  
+arduino = ArduinoSerial('COM3', 115200)  
 
 # Register the stop_reading function to be called on exit
 atexit.register(arduino.stop_reading)
