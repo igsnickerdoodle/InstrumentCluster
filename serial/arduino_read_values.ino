@@ -15,8 +15,10 @@ const int mapMaxValues[numPins] = {280, 280};
 
 bool isRunning = false;  // Flag to control whether main loop is executed
 
+float RPM = 0;  // Declare RPM as a global variable
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   for (int pin = 0; pin < numPins; pin++) {
     for (int i = 0; i < numReadings; i++) {
       readings[pin][i] = 0;
@@ -67,10 +69,11 @@ void loop() {
     }
   }
   
-  float RPM;
-  if (pulseTime(100000, RPM)) {
-    doc["RPM"] = (int)RPM / 2; 
+  float newRPM;
+  if (pulseTime(100000, newRPM)) {
+    RPM = newRPM;  // Update RPM if new data is available
   }
+  doc["RPM"] = (int)RPM / 2;  // Always include RPM in the message
 
   serializeJson(doc, Serial);
   Serial.println();
