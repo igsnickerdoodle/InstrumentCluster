@@ -2,30 +2,15 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer, QPoint
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
 import math, sys
-#from components.arduino_serial import arduino
-from arduino_serial import arduino
-
-
 
 class Speedometer(QWidget):
     def __init__(self):
         super().__init__()
-        self.arduino = arduino
-        
-        # Create a QTimer to update the RPM value periodically
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_values)
-        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
-
-
         # Define additional properties if needed, e.g.:
         self.fuel = 0
         self.speed = 0
         self.oil_temp = 0
-        
-      
-      
-        
+             
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -120,8 +105,7 @@ class Speedometer(QWidget):
         painter.drawArc(125 + shadowOffset, 125 + shadowOffset, 250, 250, 136 * 16, -91 * 16)
         painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
         painter.drawArc(125, 125, 250, 250, 136 * 16, -91 * 16)   
-       
- 
+        
     def Speed(self, painter):
         pivot_x = 250
         pivot_y = 250
@@ -186,8 +170,6 @@ class Speedometer(QWidget):
         self.repaint_speed()  # Trigger a repaint of the widget without clearing the background
     def repaint_speed(self):
         self.update()
-
-
 
     def FuelNeedle(self, painter):
         start_angle = -39  
@@ -294,8 +276,6 @@ class Speedometer(QWidget):
     def repaint_fuel(self):
         self.update()
 
-
-
     def OilTemp(self, painter):
         start_angle = 230
         end_angle = 130
@@ -395,18 +375,13 @@ class Speedometer(QWidget):
     def repaint_oil_temp(self):
         self.update()
 
-
-
-    def update_values(self):
-        self.arduino.read_values()
-        current_values = self.arduino.current_values
-
-        if "MPH" in current_values:
-            self.update_speed(current_values["MPH"])
-        if "Oil Temp" in current_values:
-            self.update_oil_temp(current_values["Oil Temp"])  
-        if "Fuel" in current_values:
-            self.update_fuel(current_values["Fuel"])  
+    def update_data(self, data):
+        if "MPH" in data:
+            self.update_speed(data["MPH"])
+        if "Oil Temp" in data:
+            self.update_oil_temp(data["Oil Temp"])
+        if "Fuel" in data:
+            self.update_fuel(data["Fuel"])
  
 class MainWindow(QMainWindow):
     def __init__(self):
