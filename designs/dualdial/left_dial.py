@@ -2,23 +2,25 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QSlider, QGridLay
 from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize, QTimer
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
 import math, sys
+
+
 #from components.arduino_serial import arduino
 from arduino_serial import arduino
+
 class Tachometer(QWidget):
     def __init__(self):
-        super().__init__()        
+        super().__init__()     
+           
         self.arduino = arduino       
-        # Create a QTimer to update the RPM value periodically
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_values)
         self.timer.start(50)  # Update every 1000 milliseconds (1 second)
-        # Set Default Boost Level
+
+
+        ## Initialize default values
         self.boost_value = 0
-        # Initial RPM value (set to 0)
         self.rpm = 0
-        # Initial Fuel Reading
         self.coolant = 0
-        
         self.afr_value = 14.7
         
 
