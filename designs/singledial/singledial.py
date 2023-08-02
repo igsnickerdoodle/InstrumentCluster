@@ -64,10 +64,12 @@ class Tachometer(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
+
         self.drawGradient(painter)
         self.drawSideArcs(painter)
         self.drawIndicators(painter)
-        self.RpmNeedle(painter)              
+
+        self.RpmNeedle(painter)   
         self.drawCenterCircle(painter)
         self.current_display(painter, self.boost_value)
         self.CoolantTemp(painter)
@@ -102,7 +104,7 @@ class Tachometer(QWidget):
 
         self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
         self.toggle_button_center_top.clicked.connect(self.swap_display)
-        self.toggle_button_center_top.setGeometry(10, 10, 120, 40)  # Adjust the size and position as needed
+        self.toggle_button_center_top.setGeometry(10, 170, 120, 40)  # Adjust the size and position as needed
         self.toggle_button_center_top.setStyleSheet("background-color: red")
         self.toggle_button_center_top.show()
 
@@ -123,13 +125,14 @@ class Tachometer(QWidget):
         self.toggle_button_foglights.setGeometry(10, 110, 120, 40)
         self.toggle_button_foglights.setStyleSheet("background-color: red")
         self.toggle_button_foglights.show()
-        
+
     def swap_display(self):
+        print("Button clicked!")  # If this doesn't print, the button is not connected properly
         if self.current_display == self.BoostGauge:
             self.current_display = self.OilTemp
-    
         else:
             self.current_display = self.BoostGauge
+        self.update()
 
     def drawGradient(self, painter):
         arc_x = global_x - 30
@@ -156,21 +159,20 @@ class Tachometer(QWidget):
     def drawSideArcs(self, painter):
         
         pen = QPen(QColor(26, 26, 26))
-
         pen.setWidth(18)  # Set line width
-
         painter.setPen(pen)
-
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(0 + global_x, global_y, 600, 600, 25 * 16, -50 * 16)   
-
-
+        painter.drawArc(global_x - 30, global_y, 600, 600, 25 * 16, -50 * 16)   
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(global_x - 80, global_y, 600, 600, 2480, 50 * 16)
+        painter.drawArc(global_x - 70, global_y, 600, 600, 2480, 50 * 16)
                    
     def drawCenterCircle(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(26, 26, 26)) 
+        painter.setBrush(QColor(8, 8, 8)) 
+        # Create a pen
+        pen = QPen(QColor(10, 10, 10))  # Change this to the color you want for the border
+        pen.setWidth(5)  # Change this to set the width of the border
+        painter.setPen(pen)
         # Draw the circle
         center_x = 250 + global_x # X coordinate of the center of the circle
         center_y = 300 + global_y  # Y coordinate of the center of the circle
@@ -266,13 +268,16 @@ class Tachometer(QWidget):
         boost_value = kwargs.get('boost_value', self.boost_value)
         text_x_offset = -5 
         font_name = "Nimbus Sans Bold"
+
         # Parameters for Arc
         pivot_x = 250 + global_x
         pivot_y = 253 + global_y
+
         # Parameter for Max Values
         pivot_text_max_y = 200
         pivot_text_psi_x = 195
         pivot_text_hg_x = 280
+
         # Parameters for Center Text
         pivot_text_center_y = 235 + global_y
         pivot_text_center_x = 240 + global_x
@@ -341,7 +346,7 @@ class Tachometer(QWidget):
         boostbg_x = 35
         boostbg_y = 85
         boostbg_size = 430
-        shadowColor = QColor(0, 0, 0, 128)  # Semi-transparent black
+        shadowColor = QColor(8, 8, 8, 128)  # Semi-transparent black
         shadowOffset = 2
         painter.setPen(QPen(shadowColor, 20, Qt.SolidLine))
         painter.drawArc(boostbg_x + shadowOffset + global_x, boostbg_y + shadowOffset + global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
