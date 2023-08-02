@@ -46,20 +46,20 @@ class Tachometer(QWidget):
         self.highbeams_on = False
         self.foglights_on = False
 
-        self.slider = QSlider(Qt.Horizontal)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(8000)  # Assuming the RPM range is from 0 to 10000
-        self.slider.setValue(self.rpm)
-        self.slider.setTickPosition(QSlider.TicksBelow)
-        self.slider.setTickInterval(500)
+        #self.slider = QSlider(Qt.Horizontal)
+        #self.slider.setMinimum(0)
+        #self.slider.setMaximum(8000)  # Assuming the RPM range is from 0 to 10000
+        #self.slider.setValue(self.rpm)
+        #self.slider.setTickPosition(QSlider.TicksBelow)
+        #self.slider.setTickInterval(500)
 
-        self.slider.valueChanged.connect(self.update_rpm)
+        #self.slider.valueChanged.connect(self.update_rpm)
 
-        layout = QVBoxLayout()
-        layout.addStretch(1)  # Add a stretch before the slider
-        layout.addWidget(self.slider)
+        #layout = QVBoxLayout()
+        #layout.addStretch(1)  # Add a stretch before the slider
+        #layout.addWidget(self.slider)
 
-        self.setLayout(layout)
+        #self.setLayout(layout)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -71,6 +71,7 @@ class Tachometer(QWidget):
 
         self.RpmNeedle(painter)   
         self.drawCenterCircle(painter)
+        self.top_center_bg(painter)
         self.current_display(painter, self.boost_value)
         self.CoolantTemp(painter)
         self.AFR(painter)
@@ -125,7 +126,18 @@ class Tachometer(QWidget):
         self.toggle_button_foglights.setGeometry(10, 110, 120, 40)
         self.toggle_button_foglights.setStyleSheet("background-color: red")
         self.toggle_button_foglights.show()
-
+    def top_center_bg(self, painter):
+        # Boost arc background
+        boostbg_x = 35
+        boostbg_y = 85
+        boostbg_size = 430
+        shadowColor = QColor(8, 8, 8, 128)  # Semi-transparent black
+        shadowOffset = 2
+        painter.setPen(QPen(shadowColor, 20, Qt.SolidLine))
+        painter.drawArc(boostbg_x + shadowOffset + global_x, boostbg_y + shadowOffset + global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
+        painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
+        painter.drawArc(boostbg_x + global_x, boostbg_y + global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
+ 
     def swap_display(self):
         print("Button clicked!")  # If this doesn't print, the button is not connected properly
         if self.current_display == self.BoostGauge:
@@ -274,12 +286,12 @@ class Tachometer(QWidget):
         pivot_y = 253 + global_y
 
         # Parameter for Max Values
-        pivot_text_max_y = 200
-        pivot_text_psi_x = 195
-        pivot_text_hg_x = 280
+        pivot_text_max_y = 220
+        pivot_text_psi_x = 235
+        pivot_text_hg_x = 235
 
         # Parameters for Center Text
-        pivot_text_center_y = 235 + global_y
+        pivot_text_center_y = 220 + global_y
         pivot_text_center_x = 240 + global_x
         
         rect_size = 255  # Diameter of the gauge
@@ -342,16 +354,6 @@ class Tachometer(QWidget):
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
                              int(pivot_y + rect_size/2 - pivot_text_center_y), f'{boost_value}hg')  # Current value label
             
-        # Boost arc background
-        boostbg_x = 35
-        boostbg_y = 85
-        boostbg_size = 430
-        shadowColor = QColor(8, 8, 8, 128)  # Semi-transparent black
-        shadowOffset = 2
-        painter.setPen(QPen(shadowColor, 20, Qt.SolidLine))
-        painter.drawArc(boostbg_x + shadowOffset + global_x, boostbg_y + shadowOffset + global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
-        painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
-        painter.drawArc(boostbg_x + global_x, boostbg_y + global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
     def update_boost(self, value):
         self.boost_value = int(value)
         self.repaint_boost()  # Trigger a repaint of the Boost gauge only        
@@ -364,13 +366,13 @@ class Tachometer(QWidget):
         end_angle = 130
         major_length = 12
         minor_length = 6
-        needle_radius = 135
+        needle_radius = 225
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "C", 100: "H"}
         pivot_x = 250 + global_x
-        pivot_y = 253 + global_y
-        text_radius = 100
+        pivot_y = 300 + global_y
+        text_radius = 200
         text_angle_offsets = {0: 1, 50: -2.5, 100: -3}
         # Calculate angle range
         angle_range = end_angle - start_angle
@@ -402,7 +404,6 @@ class Tachometer(QWidget):
             painter.setRenderHint(QPainter.Antialiasing)
             painter.setPen(pen)
             painter.drawPath(indicator_path)
-
         # Draw the minor indicators
         for value, length in minor_indicators.items():
             value_scaled = (value / 100) * angle_range
@@ -445,25 +446,22 @@ class Tachometer(QWidget):
         # Position of the text field
         pivot_x_offset = 0  # Adjust this value as desired
         text_field_x = pivot_x + pivot_x_offset
-        text_field_y = pivot_y + -100  + global_y 
+        text_field_y = pivot_y + global_y - 250
 
         # Draw the text field with the current value
-        font = QFont("Nimbus Sans Bold", 11) 
-        painter.setFont(font)
+        oiltemp_font = QFont("Nimbus Sans Bold", 10) 
+        painter.setFont(oiltemp_font)
         painter.setPen(QPen(Qt.white))  # Adjust color as needed
 
         # Your text
         text = str(round(((self.oil_temp / 260) * 260))) + 'C'
-
         # Calculate the text width
         metrics = QFontMetrics(font)
         width = metrics.width(text)
-
-        # Adjust the x-coordinate
         text_field_x_adjusted = text_field_x - width / 2  
-
         # Draw the text
         painter.drawText(QPointF(text_field_x_adjusted, text_field_y), text)
+
     def update_oil_temp(self, value):
         # Update the Fuel value based on the slider position
         self.oil_temp = int(value)
