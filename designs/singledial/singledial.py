@@ -13,7 +13,6 @@ import math, sys
 global_x = 280
 global_y = 50
 
-
 ##
 
 class Tachometer(QWidget):
@@ -52,13 +51,10 @@ class Tachometer(QWidget):
         #self.slider.setValue(self.rpm)
         #self.slider.setTickPosition(QSlider.TicksBelow)
         #self.slider.setTickInterval(500)
-
         #self.slider.valueChanged.connect(self.update_rpm)
-
         #layout = QVBoxLayout()
         #layout.addStretch(1)  # Add a stretch before the slider
         #layout.addWidget(self.slider)
-
         #self.setLayout(layout)
 
     def paintEvent(self, event):
@@ -102,7 +98,6 @@ class Tachometer(QWidget):
 #            self.update_speed(current_values["MPH"])
 
     def create_toggle_buttons(self):
-
         self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
         self.toggle_button_center_top.clicked.connect(self.swap_display)
         self.toggle_button_center_top.setGeometry(10, 170, 120, 40)  # Adjust the size and position as needed
@@ -139,7 +134,7 @@ class Tachometer(QWidget):
         painter.drawArc(boostbg_x + global_x, boostbg_y + global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
  
     def swap_display(self):
-        print("Button clicked!")  # If this doesn't print, the button is not connected properly
+        #print("Button clicked!")  # If this doesn't print, the button is not connected properly
         if self.current_display == self.BoostGauge:
             self.current_display = self.OilTemp
         else:
@@ -174,22 +169,25 @@ class Tachometer(QWidget):
         pen.setWidth(18)  # Set line width
         painter.setPen(pen)
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(global_x - 30, global_y, 600, 600, 25 * 16, -50 * 16)   
+        painter.drawArc(global_x - 35, global_y, 600, 600, 25 * 16, -50 * 16)   
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(global_x - 70, global_y, 600, 600, 2480, 50 * 16)
+        painter.drawArc(global_x - 65, global_y, 600, 600, 2480, 50 * 16)
                    
     def drawCenterCircle(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(8, 8, 8)) 
+        painter.setBrush(QColor(0, 0, 0))
+
         # Create a pen
-        pen = QPen(QColor(10, 10, 10))  # Change this to the color you want for the border
+        pen = QPen(QColor(0, 0, 0))  # Change this to the color you want for the border
         pen.setWidth(5)  # Change this to set the width of the border
         painter.setPen(pen)
+
         # Draw the circle
         center_x = 250 + global_x # X coordinate of the center of the circle
         center_y = 300 + global_y  # Y coordinate of the center of the circle
         radius = 225  # Radius of the circle
-        painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                        
+
+        painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                 
     def drawIndicators(self, painter):
         start_angle = -5  
         end_angle = 269  
@@ -363,17 +361,18 @@ class Tachometer(QWidget):
 
     def OilTemp(self, painter, *args, **kwargs):
         start_angle = 230
-        end_angle = 130
+        end_angle = 132
         major_length = 12
         minor_length = 6
-        needle_radius = 225
+        needle_radius = 218
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "C", 100: "H"}
         pivot_x = 250 + global_x
-        pivot_y = 300 + global_y
+        pivot_y = 295 + global_y
         text_radius = 200
         text_angle_offsets = {0: 1, 50: -2.5, 100: -3}
+        
         # Calculate angle range
         angle_range = end_angle - start_angle
 
@@ -435,6 +434,7 @@ class Tachometer(QWidget):
         start_y = pivot_y + needle_radius * math.sin(math.radians(90 - needle_angle))
         end_x = pivot_x + (needle_radius - 10) * math.cos(math.radians(90 - needle_angle))
         end_y = pivot_y + (needle_radius - 10) * math.sin(math.radians(90 - needle_angle))
+
         path = QPainterPath()
         path.moveTo(start_x, start_y)
         path.lineTo(end_x, end_y)
@@ -446,14 +446,14 @@ class Tachometer(QWidget):
         # Position of the text field
         pivot_x_offset = 0  # Adjust this value as desired
         text_field_x = pivot_x + pivot_x_offset
-        text_field_y = pivot_y + global_y - 250
+        text_field_y = pivot_y + global_y - 240
 
         # Draw the text field with the current value
         oiltemp_font = QFont("Nimbus Sans Bold", 10) 
         painter.setFont(oiltemp_font)
         painter.setPen(QPen(Qt.white))  # Adjust color as needed
 
-        # Your text
+        ## Display OilTemp in Text 
         text = str(round(((self.oil_temp / 260) * 260))) + 'C'
         # Calculate the text width
         metrics = QFontMetrics(font)
@@ -504,19 +504,19 @@ class Tachometer(QWidget):
         self.update()
 
     def CoolantTemp(self, painter):
-        start_angle = 60
-        end_angle = 120
+        start_angle = 62
+        end_angle = 118
         major_length = 12
         minor_length = 6
-        needle_radius = 210
+        needle_radius = 300
         major_indicators = {0: major_length, 210: major_length, 420: major_length}
         minor_indicators = {105: minor_length, 315: minor_length}
         text_labels = {0: "C", 420: "H"}
-        pivot_x = 290 + global_x
-        pivot_y = 250 + global_y
+        pivot_x = 265 + global_x
+        pivot_y = 300 + global_y
         
-        text_radius = 185
-        text_angle_offsets = {0: 3, 210: -2.5, 420: -3}
+        text_radius = 300
+        text_angle_offsets = {0:-2.5, 210: -2.5, 420: 2.5}
         
         # Calculate angle range
         angle_range = end_angle - start_angle
@@ -575,8 +575,8 @@ class Tachometer(QWidget):
             temp_scaled = ((210 - 0) / (420 - 0)) * angle_range  # Use the lower limit of the buffer zone to scale
         if self.coolant >= 220:
             # Load the image from resources folder
- #           image_path = '/srv/pyapp/resources/coolant_warning_icon.png'  # Replace with the actual image file path
- #           warning_icon = QPixmap(image_path)
+            image_path = '/srv/pyapp/resources/coolant_warning_icon.png'  # Replace with the actual image file path
+            warning_icon = QPixmap(image_path)
  #           if warning_icon.isNull():
  #              print(f"Warning: Unable to load image at {image_path}")
 
@@ -619,13 +619,13 @@ class Tachometer(QWidget):
         end_angle = 45
         major_length = 10
         minor_length = 3
-        needle_radius = 135
+        needle_radius = 218
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "Rich", 100: "Lean"}
         pivot_x = 250 + global_x
-        pivot_y = 247 + global_y
-        text_radius = 115
+        pivot_y = 300 + global_y
+        text_radius = 195
         text_angle_offsets = {0: 0, 0: 0, 0: 0}
         # Calculate angle range
         angle_range = end_angle - start_angle
@@ -692,7 +692,7 @@ class Tachometer(QWidget):
 
         # Position of the text field
         text_field_x = pivot_x  + -10 # Adjust these values as desired
-        text_field_y = pivot_y + 115  # Adjust these values as desired
+        text_field_y = pivot_y + 200  # Adjust these values as desired
 
         # Draw the text field with the current value
         font = QFont("Nimbus Sans", 10)  # Adjust font size as needed
@@ -707,7 +707,7 @@ class Tachometer(QWidget):
 
     def mph(self, painter):
         pivot_x = 250 + global_x
-        pivot_y = 250 + global_y
+        pivot_y = 450 + global_y
 
         font_size_value = 30  
         font_size_suffix = 10
@@ -721,17 +721,21 @@ class Tachometer(QWidget):
         text_height_value = fontMetrics_value.height()
 
         # calculate text dimensions for suffix
-        fontMetrics_suffix = QFontMetrics(font_suffix)
-        text_width_suffix = fontMetrics_suffix.horizontalAdvance(" mph")
-        text_height_suffix = fontMetrics_suffix.height()
+        #fontMetrics_suffix = QFontMetrics(font_suffix)
+        #text_width_suffix = fontMetrics_suffix.horizontalAdvance(" mph")
+        #text_height_suffix = fontMetrics_suffix.height()
+
 
         # calculate center positions for value
         text_x_value = pivot_x - text_width_value / 2
         text_y_value = pivot_y - text_height_value / 2 + fontMetrics_value.ascent()  # ascent() accounts for baseline offset
 
         # calculate position for suffix
-        text_x_suffix = pivot_x - text_width_suffix / 2  # Center the "mph" text
-        text_y_suffix = pivot_y + text_height_value / 2 + text_height_suffix  # adjust this to align the suffix under the line
+        #text_x_suffix = pivot_x - text_width_suffix / 2  # Center the "mph" text
+        #text_y_suffix = pivot_y + text_height_value / 2 + text_height_suffix  # adjust this to align the suffix under the line
+        # calculate position for suffix
+        text_x_suffix = text_x_value + text_width_value  # Place the "mph" text right after the speed value
+        text_y_suffix = text_y_value  # Place the "mph" at the same vertical position as the speed value
 
         # draw value
         painter.setFont(font_value)
@@ -739,60 +743,46 @@ class Tachometer(QWidget):
         painter.drawText(int(text_x_value), int(text_y_value), "{:.0f}".format(self.speed))
 
         # Draw a longer line
-        line_y = pivot_y + text_height_value / 2  # place the line under the text
-        painter.drawLine(int(text_x_value - 10), int(line_y), int(text_x_value + text_width_value + 10), int(line_y))
+        #line_y = pivot_y + text_height_value / 2  # place the line under the text
+        #painter.drawLine(int(text_x_value - 10), int(line_y), int(text_x_value + text_width_value + 10), int(line_y))
 
         # draw suffix
         painter.setFont(font_suffix)
-        painter.drawText(int(text_x_suffix), int(text_y_suffix), "mph")
+        painter.drawText(int(text_x_suffix), int(text_y_suffix), " mph")
     def update_speed(self, value):
         self.speed = int(value)
 
     def FuelNeedle(self, painter):
-        start_angle = 300  
-        end_angle = 240
+        start_angle = 298
+        end_angle = 242
         major_length = 12
         minor_length = 6
-        needle_radius = 210
+        needle_radius = 300
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
-        text_labels = {0: "E", 50: "1/2", 100: "F"}
-        pivot_x = 210 + global_x
-        pivot_y = 250 + global_y
-        
-#        low_fuel_x = 150 + global_x
-#       low_fuel_y = 190 + global_y
-        # Calculate "Low Fuel" warning position
-#        warning_x = low_fuel_x
-#        warning_y = low_fuel_y + low_fuel_text_radius
-                
-        text_radius = 190
-#        low_fuel_text_radius = 145
-        text_angle_offsets = {0: 3, 50: -2.5, 100: -3}
+        text_labels = {0: "E", 100: "F"}
+        pivot_x = 235 + global_x
+        pivot_y = 300 + global_y
+        text_radius = 300
+        text_angle_offsets = {0: 3, 50: -2.5, 100: -3}        
     
         # Display "Low Fuel" warning when fuel level is >= 13%
-#        if self.fuel <= 13:
-#            image_path = '/srv/pyapp/resources/low_fuel_indicator.png'  # Replace with the actual image file path
-#            warning_icon = QPixmap(image_path)
-            # Debugging
-#            if warning_icon.isNull():
-#                print(f"Warning: Unable to load image at {image_path}")
+        if self.fuel <= 13:
+            image_path = 'InstrumentCluster/resources/low_fuel_indicator.png'  # Replace with the actual image file path
+            warning_icon = QPixmap(image_path)
 
             # Scale the image
-#            scaled_size = QSize(23, 23)
-#            warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            scaled_size = QSize(23, 23)
+            warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
             # Fine tune image x,y positions
-#            image_x_position = 35 + global_x 
-#            image_y_position = 358 + global_y 
+            image_x_position = global_x - 45
+            image_y_position = 460 + global_y 
 
             # Draw the image
-#            painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
-
-
+            painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
         # Calculate angle range
         angle_range = end_angle - start_angle
-
         # Draw the major indicators
         for value, length in major_indicators.items():
             value_scaled = (value / 100) * angle_range
@@ -863,7 +853,7 @@ class Tachometer(QWidget):
 
 ## indicators light section
     def swap_display_cel(self):
-        self.indicator_light_cel.setGeometry(238 + global_x, 390 + global_y, 30, 30) 
+        self.indicator_light_cel.setGeometry(238 + global_x, 500 + global_y, 30, 30) 
         if self.cel_on:
             self.indicator_light_cel.clear()
             self.cel_on = False
@@ -875,7 +865,7 @@ class Tachometer(QWidget):
         self.indicator_light_cel.show()
 
     def swap_display_highbeams(self):
-        self.indicator_light_highbeams.setGeometry(320 + global_x, 390 + global_y, 30, 30)
+        self.indicator_light_highbeams.setGeometry(320 + global_x, 500 + global_y, 30, 30)
         if self.highbeams_on:
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
@@ -887,7 +877,7 @@ class Tachometer(QWidget):
         self.indicator_light_highbeams.show()
 
     def swap_display_foglights(self):
-        self.indicator_light_foglights.setGeometry(140 + global_x, 390 + global_y, 30, 30)
+        self.indicator_light_foglights.setGeometry(140 + global_x, 500 + global_y, 30, 30)
         if self.foglights_on:
             self.indicator_light_foglights.clear()
             self.foglights_on = False
@@ -901,11 +891,14 @@ class Tachometer(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("background-color: black;")        
+        self.setStyleSheet("background-color: black;")
+                
         # Create a ArcWidget instance
         self.tachometer = Tachometer()
+
         # Set the geometry of the MainWindow
         self.setGeometry(0, 0, 1024, 600)
+
         # Create a QWidget and set it as the central widget
         central_widget = Tachometer()
         self.setCentralWidget(central_widget)
