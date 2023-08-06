@@ -350,8 +350,7 @@ class Tachometer(QWidget):
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
-                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'{boost_value}hg')  # Current value label
-            
+                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'{boost_value}hg')  # Current value label            
     def update_boost(self, value):
         self.boost_value = int(value)
         self.repaint_boost()  # Trigger a repaint of the Boost gauge only        
@@ -480,7 +479,7 @@ class Tachometer(QWidget):
         angle_range = abs(end_angle - start_angle)
         needle_angle = center_angle + (self.rpm / 8000) * angle_range
         ## RPM needle image import
-        pixmap = QPixmap('InstrumentCluster/resources/rpmneedle.png')
+        pixmap = QPixmap('resources/rpmneedle.png')
         ## Secondary resize on the rpm needle 
         pixmap = pixmap.scaled(QSize(26, 90),Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         # Calculate needle position
@@ -575,7 +574,7 @@ class Tachometer(QWidget):
             temp_scaled = ((210 - 0) / (420 - 0)) * angle_range  # Use the lower limit of the buffer zone to scale
         if self.coolant >= 220:
             # Load the image from resources folder
-            image_path = '/srv/pyapp/resources/coolant_warning_icon.png'  # Replace with the actual image file path
+            image_path = 'resources/coolant_warning_icon.png'  # Replace with the actual image file path
             warning_icon = QPixmap(image_path)
  #           if warning_icon.isNull():
  #              print(f"Warning: Unable to load image at {image_path}")
@@ -768,7 +767,7 @@ class Tachometer(QWidget):
     
         # Display "Low Fuel" warning when fuel level is >= 13%
         if self.fuel <= 13:
-            image_path = 'InstrumentCluster/resources/low_fuel_indicator.png'  # Replace with the actual image file path
+            image_path = 'resources/low_fuel_indicator.png'  # Replace with the actual image file path
             warning_icon = QPixmap(image_path)
 
             # Scale the image
@@ -858,31 +857,29 @@ class Tachometer(QWidget):
             self.indicator_light_cel.clear()
             self.cel_on = False
         else:
-            pixmap = QPixmap('InstrumentCluster/resources/cel.png')
+            pixmap = QPixmap('resources/cel.png')
             pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_cel.setPixmap(pixmap)
             self.cel_on = True
         self.indicator_light_cel.show()
-
     def swap_display_highbeams(self):
         self.indicator_light_highbeams.setGeometry(320 + global_x, 500 + global_y, 30, 30)
         if self.highbeams_on:
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
         else:
-            pixmap = QPixmap('InstrumentCluster/resources/High_Beam.png')
+            pixmap = QPixmap('resources/High_Beam.png')
             pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_highbeams.setPixmap(pixmap)
             self.highbeams_on = True
         self.indicator_light_highbeams.show()
-
     def swap_display_foglights(self):
         self.indicator_light_foglights.setGeometry(140 + global_x, 500 + global_y, 30, 30)
         if self.foglights_on:
             self.indicator_light_foglights.clear()
             self.foglights_on = False
         else:
-            pixmap = QPixmap('InstrumentCluster/resources/Fog_light.png')
+            pixmap = QPixmap('resources/Fog_light.png')
             pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.indicator_light_foglights.setPixmap(pixmap)
             self.foglights_on = True
