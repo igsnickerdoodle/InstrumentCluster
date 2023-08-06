@@ -7,19 +7,19 @@ import math, sys
 # Module import
 #from ...components import arduino
 #from components.arduino.arduino_serial import arduino
+from components.coolant_temp.coolant_singledisplay import CoolantGauge
 
-## 
-
-global_x = 280
-global_y = 50
-
-##
-
-class Tachometer(QWidget):
+class Config:
+    def __init__(self):
+        self.global_x = 280
+        self.global_y = 50
+        
+class Display(QWidget):
     def __init__(self):
         super().__init__()
-
-#        self.arduino = arduino 
+        self.coolantgauge = CoolantGauge()
+        self.config = Config()
+        
 #        self.timer = QTimer(self)
 #        self.timer.timeout.connect(self.update_values)
 #        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
@@ -56,7 +56,6 @@ class Tachometer(QWidget):
         #layout.addStretch(1)  # Add a stretch before the slider
         #layout.addWidget(self.slider)
         #self.setLayout(layout)
-
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -69,7 +68,8 @@ class Tachometer(QWidget):
         self.drawCenterCircle(painter)
         self.top_center_bg(painter)
         self.current_display(painter, self.boost_value)
-        self.CoolantTemp(painter)
+        #self.CoolantTemp(painter)
+        self.coolantgauge.paintEvent(event)
         self.AFR(painter)
         self.mph(painter)
         self.FuelNeedle(painter)
@@ -121,6 +121,7 @@ class Tachometer(QWidget):
         self.toggle_button_foglights.setGeometry(10, 110, 120, 40)
         self.toggle_button_foglights.setStyleSheet("background-color: red")
         self.toggle_button_foglights.show()
+        
     def top_center_bg(self, painter):
         # Boost arc background
         boostbg_x = 35
@@ -129,9 +130,9 @@ class Tachometer(QWidget):
         shadowColor = QColor(8, 8, 8, 128)  # Semi-transparent black
         shadowOffset = 2
         painter.setPen(QPen(shadowColor, 20, Qt.SolidLine))
-        painter.drawArc(boostbg_x + shadowOffset + global_x, boostbg_y + shadowOffset + global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
+        painter.drawArc(boostbg_x + shadowOffset + self.config.global_x, boostbg_y + shadowOffset + self.config.global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
         painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
-        painter.drawArc(boostbg_x + global_x, boostbg_y + global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
+        painter.drawArc(boostbg_x + self.config.global_x, boostbg_y + self.config.global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
  
     def swap_display(self):
         #print("Button clicked!")  # If this doesn't print, the button is not connected properly
@@ -142,8 +143,8 @@ class Tachometer(QWidget):
         self.update()
 
     def drawGradient(self, painter):
-        arc_x = global_x - 30
-        arc_y = 30 + global_y
+        arc_x = self.config.global_x - 30
+        arc_y = 30 + self.config.global_y
         arc_width = 550
         arc_height = 550
         start_angle = 332 * 16
@@ -169,9 +170,9 @@ class Tachometer(QWidget):
         pen.setWidth(18)  # Set line width
         painter.setPen(pen)
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(global_x - 35, global_y, 600, 600, 25 * 16, -50 * 16)   
+        painter.drawArc(self.config.global_x - 35, self.config.global_y, 600, 600, 25 * 16, -50 * 16)   
         painter.setPen(QPen(QColor(26, 26, 26), 25, Qt.SolidLine))
-        painter.drawArc(global_x - 65, global_y, 600, 600, 2480, 50 * 16)
+        painter.drawArc(self.config.global_x - 65, self.config.global_y, 600, 600, 2480, 50 * 16)
                    
     def drawCenterCircle(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
@@ -183,8 +184,8 @@ class Tachometer(QWidget):
         painter.setPen(pen)
 
         # Draw the circle
-        center_x = 250 + global_x # X coordinate of the center of the circle
-        center_y = 300 + global_y  # Y coordinate of the center of the circle
+        center_x = 250 + self.config.global_x # X coordinate of the center of the circle
+        center_y = 300 + self.config.global_y  # Y coordinate of the center of the circle
         radius = 225  # Radius of the circle
 
         painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                 
@@ -198,8 +199,8 @@ class Tachometer(QWidget):
         indicator_radius_1 = 290  
         indicator_radius_2 = 293  
         indicator_radius_3 = 294 
-        pivot_x = 250 + global_x
-        pivot_y = 300 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 300 + self.config.global_y
         angle_range = abs(end_angle - start_angle)
 
 
@@ -269,10 +270,10 @@ class Tachometer(QWidget):
                     indicator_pen = QPen(get_color(rpm_indicator), 2, Qt.SolidLine)
                     painter.setPen(indicator_pen)
                     painter.drawLine(start_x, start_y, end_x, end_y)
-        # Creates the Tachometer and Outline
+
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(255, 255, 255), 3, Qt.SolidLine))
-        painter.drawArc(global_x - 50, global_y, 600, 600, 315 * 16, 271 * 16)
+        painter.drawArc(self.config.global_x - 50, self.config.global_y, 600, 600, 315 * 16, 271 * 16)
 
     def BoostGauge(self, painter, *args, **kwargs):
         boost_value = kwargs.get('boost_value', self.boost_value)
@@ -280,8 +281,8 @@ class Tachometer(QWidget):
         font_name = "Nimbus Sans Bold"
 
         # Parameters for Arc
-        pivot_x = 250 + global_x
-        pivot_y = 253 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 253 + self.config.global_y
 
         # Parameter for Max Values
         pivot_text_max_y = 220
@@ -289,8 +290,8 @@ class Tachometer(QWidget):
         pivot_text_hg_x = 235
 
         # Parameters for Center Text
-        pivot_text_center_y = 220 + global_y
-        pivot_text_center_x = 240 + global_x
+        pivot_text_center_y = 220 + self.config.global_y
+        pivot_text_center_x = 240 + self.config.global_x
         
         rect_size = 255  # Diameter of the gauge
         arc_thickness = 15 
@@ -337,8 +338,8 @@ class Tachometer(QWidget):
         font = QFont(font_name)
         font.setPointSize(8)  # Adjust as needed
         painter.setFont(font)
-        painter.drawText(int(pivot_text_psi_x + global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
-        painter.drawText(int(pivot_text_hg_x + global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
+        painter.drawText(int(pivot_text_psi_x + self.config.global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
+        painter.drawText(int(pivot_text_hg_x + self.config.global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
         if boost_value >= 0:
             new_font = QFont(font_name)
             new_font.setPointSize(8)
@@ -367,8 +368,8 @@ class Tachometer(QWidget):
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "C", 100: "H"}
-        pivot_x = 250 + global_x
-        pivot_y = 295 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 295 + self.config.global_y
         text_radius = 200
         text_angle_offsets = {0: 1, 50: -2.5, 100: -3}
         
@@ -445,7 +446,7 @@ class Tachometer(QWidget):
         # Position of the text field
         pivot_x_offset = 0  # Adjust this value as desired
         text_field_x = pivot_x + pivot_x_offset
-        text_field_y = pivot_y + global_y - 240
+        text_field_y = pivot_y + self.config.global_y - 240
 
         # Draw the text field with the current value
         oiltemp_font = QFont("Nimbus Sans Bold", 10) 
@@ -469,8 +470,8 @@ class Tachometer(QWidget):
         self.update()
 
     def RpmNeedle(self, painter):
-        pivot_x = 250 + global_x
-        pivot_y = 300 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 300 + self.config.global_y
 
         start_angle = -5
         end_angle = 269
@@ -511,8 +512,8 @@ class Tachometer(QWidget):
         major_indicators = {0: major_length, 210: major_length, 420: major_length}
         minor_indicators = {105: minor_length, 315: minor_length}
         text_labels = {0: "C", 420: "H"}
-        pivot_x = 265 + global_x
-        pivot_y = 300 + global_y
+        pivot_x = 265 + self.config.global_x
+        pivot_y = 300 + self.config.global_y
         
         text_radius = 300
         text_angle_offsets = {0:-2.5, 210: -2.5, 420: 2.5}
@@ -584,8 +585,8 @@ class Tachometer(QWidget):
             warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
             # Set the position where you want to draw the image
-            image_x_position = 442 + global_x  # Replace with the actual x-coordinate
-            image_y_position = 118 + global_y # Replace with the actual y-coordinate
+            image_x_position = 442 + self.config.global_x 
+            image_y_position = 118 + self.config.global_y 
 
             # Draw the image
             painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
@@ -622,8 +623,8 @@ class Tachometer(QWidget):
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "Rich", 100: "Lean"}
-        pivot_x = 250 + global_x
-        pivot_y = 300 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 300 + self.config.global_y
         text_radius = 195
         text_angle_offsets = {0: 0, 0: 0, 0: 0}
         # Calculate angle range
@@ -705,8 +706,8 @@ class Tachometer(QWidget):
         self.update()
 
     def mph(self, painter):
-        pivot_x = 250 + global_x
-        pivot_y = 450 + global_y
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 450 + self.config.global_y
 
         font_size_value = 30  
         font_size_suffix = 10
@@ -760,8 +761,8 @@ class Tachometer(QWidget):
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "E", 100: "F"}
-        pivot_x = 235 + global_x
-        pivot_y = 300 + global_y
+        pivot_x = 235 + self.config.global_x
+        pivot_y = 300 + self.config.global_y
         text_radius = 300
         text_angle_offsets = {0: 3, 50: -2.5, 100: -3}        
     
@@ -775,8 +776,8 @@ class Tachometer(QWidget):
             warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
             # Fine tune image x,y positions
-            image_x_position = global_x - 45
-            image_y_position = 460 + global_y 
+            image_x_position = self.config.global_x - 45
+            image_y_position = 460 + self.config.global_y 
 
             # Draw the image
             painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
@@ -852,7 +853,7 @@ class Tachometer(QWidget):
 
 ## indicators light section
     def swap_display_cel(self):
-        self.indicator_light_cel.setGeometry(238 + global_x, 500 + global_y, 30, 30) 
+        self.indicator_light_cel.setGeometry(238 + self.config.global_x, 500 + self.config.global_y, 30, 30) 
         if self.cel_on:
             self.indicator_light_cel.clear()
             self.cel_on = False
@@ -863,7 +864,7 @@ class Tachometer(QWidget):
             self.cel_on = True
         self.indicator_light_cel.show()
     def swap_display_highbeams(self):
-        self.indicator_light_highbeams.setGeometry(320 + global_x, 500 + global_y, 30, 30)
+        self.indicator_light_highbeams.setGeometry(320 + self.config.global_x, 500 + self.config.global_y, 30, 30)
         if self.highbeams_on:
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
@@ -874,7 +875,7 @@ class Tachometer(QWidget):
             self.highbeams_on = True
         self.indicator_light_highbeams.show()
     def swap_display_foglights(self):
-        self.indicator_light_foglights.setGeometry(140 + global_x, 500 + global_y, 30, 30)
+        self.indicator_light_foglights.setGeometry(140 + self.config.global_x, 500 + self.config.global_y, 30, 30)
         if self.foglights_on:
             self.indicator_light_foglights.clear()
             self.foglights_on = False
@@ -891,13 +892,13 @@ class MainWindow(QMainWindow):
         self.setStyleSheet("background-color: black;")
                 
         # Create a ArcWidget instance
-        self.tachometer = Tachometer()
+        self.tachometer = Display()
 
         # Set the geometry of the MainWindow
         self.setGeometry(0, 0, 1024, 600)
 
         # Create a QWidget and set it as the central widget
-        central_widget = Tachometer()
+        central_widget = Display()
         self.setCentralWidget(central_widget)
 
 if __name__ == "__main__":
