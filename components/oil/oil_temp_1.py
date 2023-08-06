@@ -1,39 +1,23 @@
-from PyQt5.QtCore import QPoint, QPointF, QSize
-from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont, QPixmap
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import Qt
-import math
-
-class CoolantGauge(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.coolant = 0
-        self.coolant_x = 0
-        self.coolant_y = 0
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        self.CoolantTemp(painter)
-    def CoolantTemp(self, painter):
-        start_angle = 62
-        end_angle = 118
+    def OilTemp(self, painter, *args, **kwargs):
+        start_angle = 230
+        end_angle = 132
         major_length = 12
         minor_length = 6
-        needle_radius = 300
-        major_indicators = {0: major_length, 210: major_length, 420: major_length}
-        minor_indicators = {105: minor_length, 315: minor_length}
-        text_labels = {0: "C", 420: "H"}
-        pivot_x = 265 + self.coolant_x
-        pivot_y = 300 + self.coolant_y
-
-        text_radius = 300
-        text_angle_offsets = {0:-2.5, 210: -2.5, 420: 2.5}
-
+        needle_radius = 218
+        major_indicators = {0: major_length, 50: major_length, 100: major_length}
+        minor_indicators = {25: minor_length, 75: minor_length}
+        text_labels = {0: "C", 100: "H"}
+        pivot_x = 250 + self.config.global_x
+        pivot_y = 295 + self.config.global_y
+        text_radius = 200
+        text_angle_offsets = {0: 1, 50: -2.5, 100: -3}
+        
         # Calculate angle range
         angle_range = end_angle - start_angle
 
         # Draw the major indicators
         for value, length in major_indicators.items():
-            value_scaled = ((value - 0) / (420 - 0)) * angle_range  # Rescale to the new range
+            value_scaled = (value / 100) * angle_range
             indicator_angle = start_angle + value_scaled
             indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
             indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
@@ -58,10 +42,9 @@ class CoolantGauge(QWidget):
             painter.setRenderHint(QPainter.Antialiasing)
             painter.setPen(pen)
             painter.drawPath(indicator_path)
-
         # Draw the minor indicators
         for value, length in minor_indicators.items():
-            value_scaled = ((value - 0) / (420 - 0)) * angle_range  # Rescale to the new range
+            value_scaled = (value / 100) * angle_range
             indicator_angle = start_angle + value_scaled
             indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
             indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
@@ -77,33 +60,14 @@ class CoolantGauge(QWidget):
             painter.setPen(pen)
             painter.drawPath(indicator_path)
 
-        # If temperature is below 210 or above 215, scale normally
-        if self.coolant < 210 or self.coolant > 215:
-            temp_scaled = ((self.coolant - 0) / (420 - 0)) * angle_range  # Rescale to the new range
-        # If temperature is within buffer zone (210 - 215), hold the needle at 210 position
-        elif 210 <= self.coolant <= 215:
-            temp_scaled = ((210 - 0) / (420 - 0)) * angle_range  # Use the lower limit of the buffer zone to scale
-        if self.coolant >= 220:
-            # Load the image from resources folder
-            image_path = 'resources/coolant_warning_icon.png'  # Replace with the actual image file path
-            warning_icon = QPixmap(image_path)
- #           if warning_icon.isNull():
- #              print(f"Warning: Unable to load image at {image_path}")
 
-            # Scale the image
-            scaled_size = QSize(25, 25)  # Replace with your desired size
-            warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        oil_temp = (self.oil_temp / 260) * 260
 
-            # Set the position where you want to draw the image
-            image_x_position = 442 + self.coolant_x  # Replace with the actual x-coordinate
-            image_y_position = 118 + self.coolant_y  # Replace with the actual y-coordinate
-
-            # Draw the image
-            painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
-
+        # Scale the oil temperature to the range of angles
+        scaled_oil_temp = ((oil_temp - 0) / (260 - 0)) * (end_angle - start_angle)
         # Calculate the needle angle
-        needle_angle = start_angle + temp_scaled
-
+        needle_angle = start_angle + scaled_oil_temp
+        
         # Compute the start and end points of the needle
         start_x = pivot_x + needle_radius * math.cos(math.radians(90 - needle_angle))
         start_y = pivot_y + needle_radius * math.sin(math.radians(90 - needle_angle))
@@ -114,11 +78,31 @@ class CoolantGauge(QWidget):
         path.moveTo(start_x, start_y)
         path.lineTo(end_x, end_y)
         pen = QPen(Qt.red, 4)
+    
         painter.setPen(pen)
         painter.drawPath(path)
-    def update_coolant(self, value):
-        # Update the Coolant value 
-        self.coolant = int(value)
-        self.repaint_coolant() 
-    def repaint_coolant(self):
+        
+        # Position of the text field
+        pivot_x_offset = 0  # Adjust this value as desired
+        text_field_x = pivot_x + pivot_x_offset
+        text_field_y = pivot_y + self.config.global_y - 240
+
+        # Draw the text field with the current value
+        oiltemp_font = QFont("Nimbus Sans Bold", 10) 
+        painter.setFont(oiltemp_font)
+        painter.setPen(QPen(Qt.white))  # Adjust color as needed
+
+        ## Display OilTemp in Text 
+        text = str(round(((self.oil_temp / 260) * 260))) + 'C'
+        # Calculate the text width
+        metrics = QFontMetrics(font)
+        width = metrics.width(text)
+        text_field_x_adjusted = text_field_x - width / 2  
+        # Draw the text
+        painter.drawText(QPointF(text_field_x_adjusted, text_field_y), text)
+    def update_oil_temp(self, value):
+        # Update the Fuel value based on the slider position
+        self.oil_temp = int(value)
+        self.repaint_oil_temp()  # Trigger a repaint of the widget without clearing the background
+    def repaint_oil_temp(self):
         self.update()

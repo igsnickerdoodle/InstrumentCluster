@@ -24,12 +24,12 @@ class MainWindow(QMainWindow):
         layout = QGridLayout(label)
 
         # Create the Tachometer and Speedometer instances with transparent backgrounds
-        self.tachometer = singledial.Tachometer()
+        self.display = singledial.Display()
 
-        self.tachometer.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.display.setAttribute(Qt.WA_TranslucentBackground, True)
 
         # Add widgets to layout at specific grid locations
-        layout.addWidget(self.tachometer, 1, 0, 1, 2)  # Grid (row=1, col=0, rowspan=1, colspan=2)       
+        layout.addWidget(self.display, 1, 0, 1, 2)  # Grid (row=1, col=0, rowspan=1, colspan=2)       
 
         # Set the background color to black
         palette = QPalette()

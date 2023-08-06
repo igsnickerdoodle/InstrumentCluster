@@ -65,12 +65,18 @@ class Display(QWidget):
         self.drawGradient(painter)
         self.drawSideArcs(painter)
         self.drawIndicators(painter)
+
+        # self.RpmNeedle(painter)   
         self.drawCenterCircle(painter)
         self.top_center_bg(painter)
         self.current_display(painter, self.boost_value)
+        #self.CoolantTemp(painter)
         self.coolantgauge.CoolantTemp(painter)
         self.afr.AFR()
         self.speed()
+        # self.AFR(painter)
+        # self.mph(painter)
+        # self.FuelNeedle(painter)
         
 #    def update_values(self):
 #        self.arduino.read_values()
@@ -499,6 +505,354 @@ class Display(QWidget):
     #     self.repaint_rpm()
     # def repaint_rpm(self):
         self.update()
+
+#     def CoolantTemp(self, painter):
+#         start_angle = 62
+#         end_angle = 118
+#         major_length = 12
+#         minor_length = 6
+#         needle_radius = 300
+#         major_indicators = {0: major_length, 210: major_length, 420: major_length}
+#         minor_indicators = {105: minor_length, 315: minor_length}
+#         text_labels = {0: "C", 420: "H"}
+#         pivot_x = 265 + self.config.global_x
+#         pivot_y = 300 + self.config.global_y
+        
+#         text_radius = 300
+#         text_angle_offsets = {0:-2.5, 210: -2.5, 420: 2.5}
+        
+#         # Calculate angle range
+#         angle_range = end_angle - start_angle
+
+#         # Draw the major indicators
+#         for value, length in major_indicators.items():
+#             value_scaled = ((value - 0) / (420 - 0)) * angle_range  # Rescale to the new range
+#             indicator_angle = start_angle + value_scaled
+#             indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+#             indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+#             indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+#             indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+
+#             # Draw the text labels
+#             if value in text_labels:
+#                 text_angle = indicator_angle + text_angle_offsets.get(value, 0)
+#                 text_x = pivot_x + text_radius * math.cos(math.radians(90 - text_angle))
+#                 text_y = pivot_y + text_radius * math.sin(math.radians(90 - text_angle))
+#                 font = QFont("Nimbus Sans", 8)
+#                 painter.setFont(font)
+#                 painter.setPen(QPen(Qt.white))
+#                 painter.drawText(QPointF(text_x, text_y), text_labels[value])
+
+#             # Draw the indicator
+#             indicator_path = QPainterPath()
+#             indicator_path.moveTo(indicator_start_x, indicator_start_y)
+#             indicator_path.lineTo(indicator_end_x, indicator_end_y)
+#             pen = QPen(Qt.white, 4)  # Adjust the color and thickness as needed
+#             painter.setRenderHint(QPainter.Antialiasing)
+#             painter.setPen(pen)
+#             painter.drawPath(indicator_path)
+
+#         # Draw the minor indicators
+#         for value, length in minor_indicators.items():
+#             value_scaled = ((value - 0) / (420 - 0)) * angle_range  # Rescale to the new range
+#             indicator_angle = start_angle + value_scaled
+#             indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+#             indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+#             indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+#             indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+
+#             # Draw the indicator
+#             indicator_path = QPainterPath()
+#             indicator_path.moveTo(indicator_start_x, indicator_start_y)
+#             indicator_path.lineTo(indicator_end_x, indicator_end_y)
+#             pen = QPen(Qt.white, 2)  # Adjust the color and thickness as needed
+#             painter.setRenderHint(QPainter.Antialiasing)
+#             painter.setPen(pen)
+#             painter.drawPath(indicator_path)
+
+#         # If temperature is below 210 or above 215, scale normally
+#         if self.coolant < 210 or self.coolant > 215:
+#             temp_scaled = ((self.coolant - 0) / (420 - 0)) * angle_range  # Rescale to the new range
+#         # If temperature is within buffer zone (210 - 215), hold the needle at 210 position
+#         elif 210 <= self.coolant <= 215:
+#             temp_scaled = ((210 - 0) / (420 - 0)) * angle_range  # Use the lower limit of the buffer zone to scale
+#         if self.coolant >= 220:
+#             # Load the image from resources folder
+#             image_path = 'resources/coolant_warning_icon.png'  # Replace with the actual image file path
+#             warning_icon = QPixmap(image_path)
+#  #           if warning_icon.isNull():
+#  #              print(f"Warning: Unable to load image at {image_path}")
+
+#             # Scale the image
+#             scaled_size = QSize(25, 25)  # Replace with your desired size
+#             warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+#             # Set the position where you want to draw the image
+#             image_x_position = 442 + self.config.global_x 
+#             image_y_position = 118 + self.config.global_y 
+
+#             # Draw the image
+#             painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
+
+
+#         # Calculate the needle angle
+#         needle_angle = start_angle + temp_scaled
+
+#         # Compute the start and end points of the needle
+#         start_x = pivot_x + needle_radius * math.cos(math.radians(90 - needle_angle))
+#         start_y = pivot_y + needle_radius * math.sin(math.radians(90 - needle_angle))
+#         end_x = pivot_x + (needle_radius - 10) * math.cos(math.radians(90 - needle_angle))
+#         end_y = pivot_y + (needle_radius - 10) * math.sin(math.radians(90 - needle_angle))
+
+#         path = QPainterPath()
+#         path.moveTo(start_x, start_y)
+#         path.lineTo(end_x, end_y)
+#         pen = QPen(Qt.red, 4)
+#         painter.setPen(pen)
+#         painter.drawPath(path)
+#     def update_coolant(self, value):
+#         # Update the Fuel value based on the slider position
+#         self.coolant = int(value)
+#         self.repaint_coolant()  # Trigger a repaint of the widget without clearing the background
+#     def repaint_coolant(self):
+#         self.update()
+
+    # def AFR(self, painter):
+    #     start_angle = -45
+    #     end_angle = 45
+    #     major_length = 10
+    #     minor_length = 3
+    #     needle_radius = 218
+    #     major_indicators = {0: major_length, 50: major_length, 100: major_length}
+    #     minor_indicators = {25: minor_length, 75: minor_length}
+    #     text_labels = {0: "Rich", 100: "Lean"}
+    #     pivot_x = 250 + self.config.global_x
+    #     pivot_y = 300 + self.config.global_y
+    #     text_radius = 195
+    #     text_angle_offsets = {0: 0, 0: 0, 0: 0}
+    #     # Calculate angle range
+    #     angle_range = end_angle - start_angle
+
+    #     # Draw the major indicators
+    #     for value, length in major_indicators.items():
+    #         value_scaled = (value / 100) * angle_range
+    #         indicator_angle = start_angle + value_scaled
+    #         indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+    #         indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+    #         # Draw the text labels
+    #         if value in text_labels:
+    #             text_angle = indicator_angle + text_angle_offsets.get(value, 0)
+    #             text_x = pivot_x + text_radius * math.cos(math.radians(90 - text_angle))
+    #             text_y = pivot_y + text_radius * math.sin(math.radians(90 - text_angle))
+    #             font = QFont("Nimbus Sans", 8)
+    #             painter.setFont(font)
+    #             painter.setPen(QPen(Qt.white))
+    #             painter.drawText(QPointF(text_x, text_y), text_labels[value])
+    #         # Draw the indicator
+    #         indicator_path = QPainterPath()
+    #         indicator_path.moveTo(indicator_start_x, indicator_start_y)
+    #         indicator_path.lineTo(indicator_end_x, indicator_end_y)
+    #         pen = QPen(Qt.white, 4)  # Adjust the color and thickness as needed
+    #         painter.setRenderHint(QPainter.Antialiasing)
+    #         painter.setPen(pen)
+    #         painter.drawPath(indicator_path)
+    #     # Draw the minor indicators
+    #     for value, length in minor_indicators.items():
+    #         value_scaled = (value / 100) * angle_range
+    #         indicator_angle = start_angle + value_scaled
+    #         indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+    #         indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+
+    #         # Draw the indicator
+    #         indicator_path = QPainterPath()
+    #         indicator_path.moveTo(indicator_start_x, indicator_start_y)
+    #         indicator_path.lineTo(indicator_end_x, indicator_end_y)
+    #         pen = QPen(Qt.white, 2)  # Adjust the color and thickness as needed
+    #         painter.setRenderHint(QPainter.Antialiasing)
+    #         painter.setPen(pen)
+    #         painter.drawPath(indicator_path)
+
+    #     afr_value_scaled = ((self.afr_value - 8.5) / (18 - 8.5)) * angle_range
+    #     # Calculate the needle angle
+    #     needle_angle = start_angle + afr_value_scaled
+
+    #     # Compute the start and end points of the needle
+    #     start_x = pivot_x + needle_radius * math.cos(math.radians(90 - needle_angle))
+    #     start_y = pivot_y + needle_radius * math.sin(math.radians(90 - needle_angle))
+    #     end_x = pivot_x + (needle_radius - 10) * math.cos(math.radians(90 - needle_angle))
+    #     end_y = pivot_y + (needle_radius - 10) * math.sin(math.radians(90 - needle_angle))
+    #     path = QPainterPath()
+    #     path.moveTo(start_x, start_y)
+    #     path.lineTo(end_x, end_y)
+    #     pen = QPen(Qt.red, 4)
+
+    #     painter.setPen(pen)
+    #     painter.drawPath(path)
+
+    #     # Position of the text field
+    #     text_field_x = pivot_x  + -10 # Adjust these values as desired
+    #     text_field_y = pivot_y + 200  # Adjust these values as desired
+
+    #     # Draw the text field with the current value
+    #     font = QFont("Nimbus Sans", 10)  # Adjust font size as needed
+    #     painter.setFont(font)
+    #     painter.setPen(QPen(Qt.white))  # Adjust color as needed
+    #     painter.drawText(QPointF(text_field_x, text_field_y), str(self.afr_value))  # Use the afr_value directly
+    # def update_afr(self, value):
+    #     self.afr_value = float(value) / 100
+    #     self.repaint_afr()
+    # def repaint_afr(self):
+    #     self.update()
+
+    # def mph(self, painter):
+    #     pivot_x = 250 + self.config.global_x
+    #     pivot_y = 450 + self.config.global_y
+
+    #     font_size_value = 30  
+    #     font_size_suffix = 10
+        
+    #     font_value = QFont('Nimbus Sans', font_size_value)  
+    #     font_suffix = QFont('Nimbus Sans', font_size_suffix)  
+
+    #     # calculate text dimensions for value
+    #     fontMetrics_value = QFontMetrics(font_value)
+    #     text_width_value = fontMetrics_value.horizontalAdvance("{:.0f}".format(self.speed))
+    #     text_height_value = fontMetrics_value.height()
+
+    #     # calculate text dimensions for suffix
+    #     #fontMetrics_suffix = QFontMetrics(font_suffix)
+    #     #text_width_suffix = fontMetrics_suffix.horizontalAdvance(" mph")
+    #     #text_height_suffix = fontMetrics_suffix.height()
+
+
+    #     # calculate center positions for value
+    #     text_x_value = pivot_x - text_width_value / 2
+    #     text_y_value = pivot_y - text_height_value / 2 + fontMetrics_value.ascent()  # ascent() accounts for baseline offset
+
+    #     # calculate position for suffix
+    #     #text_x_suffix = pivot_x - text_width_suffix / 2  # Center the "mph" text
+    #     #text_y_suffix = pivot_y + text_height_value / 2 + text_height_suffix  # adjust this to align the suffix under the line
+    #     # calculate position for suffix
+    #     text_x_suffix = text_x_value + text_width_value  # Place the "mph" text right after the speed value
+    #     text_y_suffix = text_y_value  # Place the "mph" at the same vertical position as the speed value
+
+    #     # draw value
+    #     painter.setFont(font_value)
+    #     painter.setPen(QColor(255, 255, 255))  # set text color (here, white)
+    #     painter.drawText(int(text_x_value), int(text_y_value), "{:.0f}".format(self.speed))
+
+    #     # Draw a longer line
+    #     #line_y = pivot_y + text_height_value / 2  # place the line under the text
+    #     #painter.drawLine(int(text_x_value - 10), int(line_y), int(text_x_value + text_width_value + 10), int(line_y))
+
+    #     # draw suffix
+    #     painter.setFont(font_suffix)
+    #     painter.drawText(int(text_x_suffix), int(text_y_suffix), " mph")
+    # def update_speed(self, value):
+    #     self.speed = int(value)
+
+    # def FuelNeedle(self, painter):
+    #     start_angle = 298
+    #     end_angle = 242
+    #     major_length = 12
+    #     minor_length = 6
+    #     needle_radius = 300
+    #     major_indicators = {0: major_length, 50: major_length, 100: major_length}
+    #     minor_indicators = {25: minor_length, 75: minor_length}
+    #     text_labels = {0: "E", 100: "F"}
+    #     pivot_x = 235 + self.config.global_x
+    #     pivot_y = 300 + self.config.global_y
+    #     text_radius = 300
+    #     text_angle_offsets = {0: 3, 50: -2.5, 100: -3}        
+    
+    #     # Display "Low Fuel" warning when fuel level is >= 13%
+    #     if self.fuel <= 13:
+    #         image_path = 'resources/low_fuel_indicator.png'  # Replace with the actual image file path
+    #         warning_icon = QPixmap(image_path)
+
+    #         # Scale the image
+    #         scaled_size = QSize(23, 23)
+    #         warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+    #         # Fine tune image x,y positions
+    #         image_x_position = self.config.global_x - 45
+    #         image_y_position = 460 + self.config.global_y 
+
+    #         # Draw the image
+    #         painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
+    #     # Calculate angle range
+    #     angle_range = end_angle - start_angle
+    #     # Draw the major indicators
+    #     for value, length in major_indicators.items():
+    #         value_scaled = (value / 100) * angle_range
+    #         indicator_angle = start_angle + value_scaled
+    #         indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+    #         indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+
+    #         # Draw the text labels
+    #         if value in text_labels:
+    #             text_angle = indicator_angle + text_angle_offsets.get(value, 0)
+    #             text_x = pivot_x + text_radius * math.cos(math.radians(90 - text_angle))
+    #             text_y = pivot_y + text_radius * math.sin(math.radians(90 - text_angle))
+    #             font = QFont("Nimbus Sans", 8)
+    #             painter.setFont(font)
+    #             painter.setPen(QPen(Qt.white))
+    #             painter.drawText(QPointF(text_x, text_y), text_labels[value])
+
+    #         # Draw the indicator
+    #         indicator_path = QPainterPath()
+    #         indicator_path.moveTo(indicator_start_x, indicator_start_y)
+    #         indicator_path.lineTo(indicator_end_x, indicator_end_y)
+    #         pen = QPen(Qt.white, 4)  # Adjust the color and thickness as needed
+    #         painter.setRenderHint(QPainter.Antialiasing)
+    #         painter.setPen(pen)
+    #         painter.drawPath(indicator_path)
+
+    #     # Draw the minor indicators
+    #     for value, length in minor_indicators.items():
+    #         value_scaled = (value / 100) * angle_range
+    #         indicator_angle = start_angle + value_scaled
+    #         indicator_start_x = pivot_x + (needle_radius - length) * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_start_y = pivot_y + (needle_radius - length) * math.sin(math.radians(90 - indicator_angle))
+    #         indicator_end_x = pivot_x + needle_radius * math.cos(math.radians(90 - indicator_angle))
+    #         indicator_end_y = pivot_y + needle_radius * math.sin(math.radians(90 - indicator_angle))
+
+    #         # Draw the indicator
+    #         indicator_path = QPainterPath()
+    #         indicator_path.moveTo(indicator_start_x, indicator_start_y)
+    #         indicator_path.lineTo(indicator_end_x, indicator_end_y)
+    #         pen = QPen(Qt.white, 2)  # Adjust the color and thickness as needed
+    #         painter.setRenderHint(QPainter.Antialiasing)
+    #         painter.setPen(pen)
+    #         painter.drawPath(indicator_path)
+
+    #     # Scale the fuel level to the range of angles
+    #     fuel_scaled = (self.fuel / 100) * angle_range
+    #     # Calculate the needle angle
+    #     needle_angle = start_angle + fuel_scaled
+    #     # Calculates the start and end points of the needle
+    #     start_x = pivot_x + needle_radius * math.cos(math.radians(90 - needle_angle))
+    #     start_y = pivot_y + needle_radius * math.sin(math.radians(90 - needle_angle))
+    #     end_x = pivot_x + (needle_radius - 10) * math.cos(math.radians(90 - needle_angle))
+    #     end_y = pivot_y + (needle_radius - 10) * math.sin(math.radians(90 - needle_angle))
+
+    #     path = QPainterPath()
+    #     path.moveTo(start_x, start_y)
+    #     path.lineTo(end_x, end_y)
+    #     pen = QPen(Qt.red, 4)
+    #     painter.setPen(pen)
+    #     painter.drawPath(path)
+    # def update_fuel(self, value):
+    #     self.fuel = int(value)
+    #     self.repaint_fuel()
+    # def repaint_fuel(self):
+    #     self.update()
 
 ## indicators light section
     def swap_display_cel(self):
