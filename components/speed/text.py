@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont, QFontMetrics
+from . import Config, update_speed_text
 
-class Speed:
-    def __init__(self, config):
+class Speed(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.speed = 0
-        self.config = config
+        self.config = Config()
 
     def mph(self, painter):
         pivot_x = 250 + self.config.global_x
@@ -39,5 +41,4 @@ class Speed:
         painter.setFont(font_suffix)
         painter.drawText(int(text_x_suffix), int(text_y_suffix), " mph")
 
-    def update_speed(self, value):
-        self.speed = int(value)
+    update_speed_text = update_speed_text

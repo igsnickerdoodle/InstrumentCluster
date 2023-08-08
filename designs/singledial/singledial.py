@@ -1,42 +1,39 @@
 ## Mandatory import classes
-from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QLabel, QSlider, QVBoxLayout
-from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize
-from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics, QRadialGradient, QBrush
+from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QLabel
+from PyQt5.QtCore import Qt, QPoint, QPointF
+from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QPixmap, QRadialGradient, QBrush
 import math, sys
 
 from components.coolant_temp.coolant_singledisplay import CoolantGauge
 from components.speed.text import Speed
 from components.afr.app_design_1 import AFR
+from components.boost.boost_1 import BoostMeter
+from components.oil.oil_temp_1 import OilMeter
+from components.fuel.fuel_1 import FuelMeter
+from components.rpm.rpm_single_display import  RpmMeter
 
 class Config:
     def __init__(self):
+        ## Sets Global variables for components
         self.global_x = 280
         self.global_y = 50
-        
+        self.text_labels = "Nimbus Sans Bold", 8 ## Text in "TextHere", TextSize
+
 class Display(QWidget):
     def __init__(self):
         super().__init__()
-        
-        self.speed = Speed()
-        self.afr = AFR()
-        self.coolantgauge = CoolantGauge()
-        self.config = Config()
-        
-#        self.timer = QTimer(self)
-#        self.timer.timeout.connect(self.update_values)
-#        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
+        ## Initialize Modules
+        self.speed_display = Speed()
+        self.afr_display = AFR()
+        self.coolant_display = CoolantGauge()
+        self.boost_display = BoostMeter()
+        self.oil_display = OilMeter()
+        self.fuel_display = FuelMeter()
+        self.rpm_display = RpmMeter()
 
-        # Initialize Start Values
-        self.boost_value = 0
-        self.rpm = 0
-        self.coolant = 0
-        self.afr_value = 14.7
-        self.speed = 0
-        self.oil_temp = 0
-        self.fuel = 0
+        # Setup the swap displays
+        self.current_display = self.boost_display 
 
-        # Setup the initial display
-        self.current_display = self.BoostGauge  # Ensure BoostGauge is defined
         self.create_toggle_buttons()  # Ensure this method is defined
         self.indicator_light_cel = QLabel(self)
         self.indicator_light_highbeams = QLabel(self)
@@ -47,17 +44,6 @@ class Display(QWidget):
         self.highbeams_on = False
         self.foglights_on = False
 
-        #self.slider = QSlider(Qt.Horizontal)
-        #self.slider.setMinimum(0)
-        #self.slider.setMaximum(8000)  # Assuming the RPM range is from 0 to 10000
-        #self.slider.setValue(self.rpm)
-        #self.slider.setTickPosition(QSlider.TicksBelow)
-        #self.slider.setTickInterval(500)
-        #self.slider.valueChanged.connect(self.update_rpm)
-        #layout = QVBoxLayout()
-        #layout.addStretch(1)  # Add a stretch before the slider
-        #layout.addWidget(self.slider)
-        #self.setLayout(layout)
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -71,29 +57,6 @@ class Display(QWidget):
         self.coolantgauge.CoolantTemp(painter)
         self.afr.AFR()
         self.speed()
-        
-#    def update_values(self):
-#        self.arduino.read_values()
-#        current_values = self.arduino.current_values
-
-#        if "RPM" in current_values:
-#            self.update_rpm(current_values["RPM"])
-#        if "Coolant Temp" in current_values:
-#            self.update_coolant(current_values["Coolant Temp"])
-#        if "Boost" in current_values:
-#            self.update_boost(current_values["Boost"])  
-#        if "AFR" in current_values:
-#            self.update_afr(current_values["AFR"])
-#        if "Oil Temp" in current_values:
-#            self.update_oil_temp(current_values["Oil Temp"])
-#        if "Fuel" in current_values:
-#            self.update_fuel(current_values["Fuel"])
-
-#        self.speedometer.get_speed()
-#        current_MPH = self.MPH.current_MPH
-        
-#       if "MPH" in current_MPH:
-#            self.update_speed(current_values["MPH"])
 
     def create_toggle_buttons(self):
         self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)

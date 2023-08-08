@@ -1,4 +1,24 @@
-    def FuelNeedle(self, painter):
+from PyQt5.QtCore import QSize, QPoint, QPointF
+from PyQt5.QtGui import QPainter, QPen, QFont, QPixmap, QPainterPath
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import Qt
+import math
+from . import update_fuel, Config
+
+from designs.singledial.singledial import Config
+
+class FuelMeter(QWidget):
+    def __init__(self, parent=None):
+            super().__init__(parent)
+            self.fuel_level = 0
+            self.text_labels = "Nimbus Sans Bold", 8 ## Text in "TextHere", TextSize
+            self.needle_color = Qt.red
+            self.needle_size = 4
+            self.config = Config()
+            
+
+    def needle(self, painter):
+        
         start_angle = 298
         end_angle = 242
         major_length = 12
@@ -11,9 +31,9 @@
         pivot_y = 300 + self.config.global_y
         text_radius = 300
         text_angle_offsets = {0: 3, 50: -2.5, 100: -3}        
-    
-        # Display "Low Fuel" warning when fuel level is >= 13%
-        if self.fuel <= 13:
+
+        # Display "Low Fuel" warning when fuel level is >= %
+        if self.fuel_level <= 13:
             image_path = 'resources/low_fuel_indicator.png'  # Replace with the actual image file path
             warning_icon = QPixmap(image_path)
 
@@ -27,6 +47,7 @@
 
             # Draw the image
             painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
+
         # Calculate angle range
         angle_range = end_angle - start_angle
         # Draw the major indicators
@@ -43,7 +64,7 @@
                 text_angle = indicator_angle + text_angle_offsets.get(value, 0)
                 text_x = pivot_x + text_radius * math.cos(math.radians(90 - text_angle))
                 text_y = pivot_y + text_radius * math.sin(math.radians(90 - text_angle))
-                font = QFont("Nimbus Sans", 8)
+                font = QFont(self.text_labels)
                 painter.setFont(font)
                 painter.setPen(QPen(Qt.white))
                 painter.drawText(QPointF(text_x, text_y), text_labels[value])
@@ -52,6 +73,7 @@
             indicator_path = QPainterPath()
             indicator_path.moveTo(indicator_start_x, indicator_start_y)
             indicator_path.lineTo(indicator_end_x, indicator_end_y)
+
             pen = QPen(Qt.white, 4)  # Adjust the color and thickness as needed
             painter.setRenderHint(QPainter.Antialiasing)
             painter.setPen(pen)
@@ -76,7 +98,7 @@
             painter.drawPath(indicator_path)
 
         # Scale the fuel level to the range of angles
-        fuel_scaled = (self.fuel / 100) * angle_range
+        fuel_scaled = (self.fuel_level / 100) * angle_range
         # Calculate the needle angle
         needle_angle = start_angle + fuel_scaled
         # Calculates the start and end points of the needle
@@ -88,11 +110,10 @@
         path = QPainterPath()
         path.moveTo(start_x, start_y)
         path.lineTo(end_x, end_y)
-        pen = QPen(Qt.red, 4)
+        pen = QPen(self.needle_color, self.needle_size)
         painter.setPen(pen)
         painter.drawPath(path)
-    def update_fuel(self, value):
-        self.fuel = int(value)
-        self.repaint_fuel()
+
     def repaint_fuel(self):
         self.update()
+    update_fuel = update_fuel

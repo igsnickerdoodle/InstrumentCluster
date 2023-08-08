@@ -1,8 +1,24 @@
-   def BoostGauge(self, painter, *args, **kwargs):
+from PyQt5.QtCore import QRect, QRectF
+from PyQt5.QtGui import QPainter, QPen, QFont, QColor
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import Qt
+from . import update_boost
+import math
+
+from designs.singledial.singledial import Config
+
+class BoostMeter(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.config = Config()
+        self.boost_value
+        self.fontstyle = "Nimbus Sans Bold"
+        self.boost_color = "red, blue, green"
+    def display(self, painter, *args, **kwargs):
         boost_value = kwargs.get('boost_value', self.boost_value)
         text_x_offset = -5 
-        font_name = "Nimbus Sans Bold"
-
+        font_name = self.fontstyle
+        bar_color = self.boost_color
         # Parameters for Arc
         pivot_x = 250 + self.config.global_x
         pivot_y = 253 + self.config.global_y
@@ -52,14 +68,14 @@
             green = int((0 - 255) * color_ratio + 255)
             blue = 0  # Remains 0 as both red and green have 0 blue.
 
-            color = QColor(red, green, blue)
+            color = QColor(bar_color)
             painter.setPen(QPen(color, arc_thickness, Qt.SolidLine))
             painter.drawArc(arc_rect, int(end_angle * 16), int((start_angle - end_angle) * 16))
 
-        # Draw the labels
-        painter.setPen(QColor(255, 255, 255))  # Set pen color to white for the text
+        # Draw the text labels
+        painter.setPen(QColor(255, 255, 255))  
         font = QFont(font_name)
-        font.setPointSize(8)  # Adjust as needed
+        font.setPointSize(8) 
         painter.setFont(font)
         painter.drawText(int(pivot_text_psi_x + self.config.global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
         painter.drawText(int(pivot_text_hg_x + self.config.global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
@@ -68,16 +84,15 @@
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
-                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'+{boost_value}psi')  # Current value label
+                            int(pivot_y + rect_size/2 - pivot_text_center_y), f'+{boost_value}psi')  # Current value label
         else:
             new_font = QFont(font_name)
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
-                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'{boost_value}hg')  # Current value label            
-    def update_boost(self, value):
-        self.boost_value = int(value)
-        self.repaint_boost()  # Trigger a repaint of the Boost gauge only        
+                            int(pivot_y + rect_size/2 - pivot_text_center_y), f'{boost_value}hg')  # Current value label                 
     def repaint_boost(self):
         rect = QRect(90, 90, 220, 220)  # Define the area to be repainted (Boost gauge region)
         self.repaint(rect)  # Trigger a repaint of the specified region   
+
+    update_boost = update_boost

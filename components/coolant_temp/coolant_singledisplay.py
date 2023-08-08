@@ -2,14 +2,16 @@ from PyQt5.QtCore import QPoint, QPointF, QSize
 from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont, QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
+from . import update_coolant, Config
 import math
 
 class CoolantGauge(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.config = Config()
         self.coolant = 0
-        self.coolant_x = 0
-        self.coolant_y = 0
+        self.coolant_x = 0 + self
+        self.coolant_y = 0 + self
     def paintEvent(self, event):
         painter = QPainter(self)
         self.CoolantTemp(painter)
@@ -116,9 +118,6 @@ class CoolantGauge(QWidget):
         pen = QPen(Qt.red, 4)
         painter.setPen(pen)
         painter.drawPath(path)
-    def update_coolant(self, value):
-        # Update the Coolant value 
-        self.coolant = int(value)
-        self.repaint_coolant() 
     def repaint_coolant(self):
         self.update()
+    update_coolant = update_coolant

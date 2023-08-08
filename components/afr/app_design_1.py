@@ -2,6 +2,7 @@ from PyQt5.QtCore import QPoint, QPointF, QSize
 from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont, QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
+from . import update_afr
 import math
 
 class AFR(QWidget):
@@ -10,6 +11,7 @@ class AFR(QWidget):
         self.afr = 14.7
         self.coolant_x = 0
         self.coolant_y = 0
+
     def AFR(self, painter):
         start_angle = -45
         end_angle = 45
@@ -95,8 +97,6 @@ class AFR(QWidget):
         painter.setFont(font)
         painter.setPen(QPen(Qt.white))  # Adjust color as needed
         painter.drawText(QPointF(text_field_x, text_field_y), str(self.afr_value))  # Use the afr_value directly
-    def update_afr(self, value):
-        self.afr_value = float(value) / 100
-        self.repaint_afr()
     def repaint_afr(self):
         self.update()
+    update_afr = update_afr
