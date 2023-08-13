@@ -1,23 +1,23 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont, QFontMetrics
-from . import Config, update_speed_text
+from . import update_speed_text, global_x, global_y, font_text_value, font_size_suffix
 
 class Speed(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super(Speed, self).__init__(parent)
         self.speed = 0
-        self.config = Config()
-
-    def mph(self, painter):
-        pivot_x = 250 + self.config.global_x
-        pivot_y = 450 + self.config.global_y
-
-        font_size_value = 30  
-        font_size_suffix = 10
+        self.global_x = global_x
+        self.global_y = global_y
+        self.font_text_value = font_text_value
+        self.font_size_suffix = font_size_suffix
         
-        font_value = QFont('Nimbus Sans', font_size_value)  
-        font_suffix = QFont('Nimbus Sans', font_size_suffix)  
+    def mph(self, painter):
+        pivot_x = 250 + self.global_x
+        pivot_y = 450 + self.global_y
+        
+        font_value = QFont(self.font_text_value)  
+        font_suffix = QFont(self.font_size_suffix)  
 
         # calculate text dimensions for value
         fontMetrics_value = QFontMetrics(font_value)

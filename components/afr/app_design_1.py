@@ -1,8 +1,8 @@
-from PyQt5.QtCore import QPoint, QPointF, QSize
-from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont, QPixmap
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-from . import update_afr
+from . import update_afr, global_x, global_y, text_labels
 import math
 
 class AFR(QWidget):
@@ -11,6 +11,9 @@ class AFR(QWidget):
         self.afr = 14.7
         self.coolant_x = 0
         self.coolant_y = 0
+        self.global_x = global_x
+        self.global_y = global_y
+        self.text_labels = text_labels
 
     def AFR(self, painter):
         start_angle = -45
@@ -21,8 +24,8 @@ class AFR(QWidget):
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "Rich", 100: "Lean"}
-        pivot_x = 250 + self.config.global_x
-        pivot_y = 300 + self.config.global_y
+        pivot_x = 250 + self.global_x
+        pivot_y = 300 + self.global_y
         text_radius = 195
         text_angle_offsets = {0: 0, 0: 0, 0: 0}
         # Calculate angle range
@@ -92,11 +95,13 @@ class AFR(QWidget):
         text_field_x = pivot_x  + -10 # Adjust these values as desired
         text_field_y = pivot_y + 200  # Adjust these values as desired
 
-        # Draw the text field with the current value
-        font = QFont("Nimbus Sans", 10)  # Adjust font size as needed
+
+        font = QFont("Nimbus Sans", 10)
         painter.setFont(font)
-        painter.setPen(QPen(Qt.white))  # Adjust color as needed
-        painter.drawText(QPointF(text_field_x, text_field_y), str(self.afr_value))  # Use the afr_value directly
+        painter.setPen(QPen(Qt.white))
+        painter.drawText(QPointF(text_field_x, text_field_y), str(self.afr_value))
+
     def repaint_afr(self):
         self.update()
+    
     update_afr = update_afr

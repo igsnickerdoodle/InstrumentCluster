@@ -4,17 +4,19 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 import math
 
-from designs.singledial.singledial import Config
-from . import update_oil_temp, Config
+from . import update_oil_temp, global_y, global_x, text_labels
 
 
 class OilMeter(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.text_labels = self.config.text_labels
+        self.global_x = global_x
+        self.global_y = global_y
+        self.text_labels = text_labels
+
         self.needle_color = Qt.red
+        
         self.needle_size = 4
-        self.config = Config()
         self.oil_temp = 0
 
     def needle(self, painter, *args, **kwargs):
@@ -26,8 +28,8 @@ class OilMeter(QWidget):
             major_indicators = {0: major_length, 50: major_length, 100: major_length}
             minor_indicators = {25: minor_length, 75: minor_length}
             text_labels = {0: "C", 100: "H"}
-            pivot_x = 250 + self.config.global_x
-            pivot_y = 295 + self.config.global_y
+            pivot_x = 250 + self.global_x
+            pivot_y = 295 + self.global_y
             text_radius = 200
             text_angle_offsets = {0: 1, 50: -2.5, 100: -3}
 
@@ -102,7 +104,7 @@ class OilMeter(QWidget):
             # Position of the text field
             pivot_x_offset = 0  # Adjust this value as desired
             text_field_x = pivot_x + pivot_x_offset
-            text_field_y = pivot_y + self.config.global_y - 240
+            text_field_y = pivot_y + self.global_y - 240
 
             # Draw the text field with the current value
             oiltemp_font = QFont("Nimbus Sans Bold", 10) 

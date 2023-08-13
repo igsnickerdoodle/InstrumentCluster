@@ -3,19 +3,20 @@ from PyQt5.QtGui import QPainter, QPen, QFont, QPixmap, QPainterPath
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 import math
-from . import update_fuel, Config
-
-from designs.singledial.singledial import Config
+from . import update_fuel, global_x, global_y, text_labels
 
 class FuelMeter(QWidget):
     def __init__(self, parent=None):
             super().__init__(parent)
+            self.global_x = global_x
+            self.global_y = global_y
+            self.text_labels = text_labels
+
             self.fuel_level = 0
-            self.text_labels = "Nimbus Sans Bold", 8 ## Text in "TextHere", TextSize
+
             self.needle_color = Qt.red
             self.needle_size = 4
-            self.config = Config()
-            
+  
 
     def needle(self, painter):
         
@@ -27,8 +28,8 @@ class FuelMeter(QWidget):
         major_indicators = {0: major_length, 50: major_length, 100: major_length}
         minor_indicators = {25: minor_length, 75: minor_length}
         text_labels = {0: "E", 100: "F"}
-        pivot_x = 235 + self.config.global_x
-        pivot_y = 300 + self.config.global_y
+        pivot_x = 235 + self.global_x
+        pivot_y = 300 + self.global_y
         text_radius = 300
         text_angle_offsets = {0: 3, 50: -2.5, 100: -3}        
 

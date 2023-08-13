@@ -1,27 +1,27 @@
 from PyQt5.QtCore import QRect, QRectF
-from PyQt5.QtGui import QPainter, QPen, QFont, QColor
+from PyQt5.QtGui import QPen, QFont, QColor
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-from . import update_boost
-import math
-
-from designs.singledial.singledial import Config
+from . import update_boost, global_y, global_x, text_labels
 
 class BoostMeter(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.config = Config()
-        self.boost_value
-        self.fontstyle = "Nimbus Sans Bold"
+        self.boost_value = 0
+        self.global_y = global_y
+        self.global_x = global_x
+        self.text_labels = text_labels
         self.boost_color = "red, blue, green"
+
+
     def display(self, painter, *args, **kwargs):
+
         boost_value = kwargs.get('boost_value', self.boost_value)
         text_x_offset = -5 
-        font_name = self.fontstyle
         bar_color = self.boost_color
         # Parameters for Arc
-        pivot_x = 250 + self.config.global_x
-        pivot_y = 253 + self.config.global_y
+        pivot_x = 250 + self.global_x
+        pivot_y = 253 + self.global_y
 
         # Parameter for Max Values
         pivot_text_max_y = 220
@@ -29,8 +29,8 @@ class BoostMeter(QWidget):
         pivot_text_hg_x = 235
 
         # Parameters for Center Text
-        pivot_text_center_y = 220 + self.config.global_y
-        pivot_text_center_x = 240 + self.config.global_x
+        pivot_text_center_y = 220 + self.global_y
+        pivot_text_center_x = 240 + self.global_x
         
         rect_size = 255  # Diameter of the gauge
         arc_thickness = 15 
@@ -74,19 +74,19 @@ class BoostMeter(QWidget):
 
         # Draw the text labels
         painter.setPen(QColor(255, 255, 255))  
-        font = QFont(font_name)
+        font = QFont(text_labels)
         font.setPointSize(8) 
         painter.setFont(font)
         painter.drawText(int(pivot_text_psi_x + self.config.global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
         painter.drawText(int(pivot_text_hg_x + self.config.global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
         if boost_value >= 0:
-            new_font = QFont(font_name)
+            new_font = QFont(text_labels)
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'+{boost_value}psi')  # Current value label
         else:
-            new_font = QFont(font_name)
+            new_font = QFont(text_labels)
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 

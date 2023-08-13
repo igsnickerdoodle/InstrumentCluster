@@ -2,28 +2,28 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPainter, QTransform, QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-from . import update_rpm, Config
+from . import update_rpm, global_x, global_y, text_labels
 import math
-from designs.singledial.singledial import Config
 
 class RpmMeter(QWidget):
         def __init__(self, parent=None):
                 super().__init__(parent)
-                self.config = Config()
+                self.global_x = global_x
+                self.global_y = global_y
                 self.rpm = 0
 
         def RpmNeedle(self, painter):
-                pivot_x = 250 + self.config.global_x
-                pivot_y = 300 + self.config.global_y
+                pivot_x = 250 + self.global_x
+                pivot_y = 300 + self.global_y
                 start_angle = -5
                 end_angle = 269
                 center_angle = (start_angle + end_angle) / 2
                 needle_radius = 260
                 angle_range = abs(end_angle - start_angle)
+                ## (self.rpm / MAXRPM)
                 needle_angle = center_angle + (self.rpm / 8000) * angle_range
-                ## RPM needle image import
                 pixmap = QPixmap('resources/rpmneedle.png')
-                ## Secondary resize on the rpm needle 
+                ## Resize the rpm needle image
                 pixmap = pixmap.scaled(QSize(26, 90),Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
                 # Calculate needle position
                 needle_x = pivot_x + needle_radius * math.cos(math.radians(needle_angle)) - pixmap.width() / 2
@@ -39,7 +39,12 @@ class RpmMeter(QWidget):
                 painter.setRenderHint(QPainter.Antialiasing)
                 # Reset transformation after drawing
                 painter.resetTransform()
+
         def repaint_rpm(self):
             self.update()
 
         update_rpm = update_rpm
+
+        def paintEvent(self, event):
+                painter = QPainter(self)
+                self.RpmNeedle(painter)
