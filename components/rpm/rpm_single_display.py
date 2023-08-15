@@ -10,7 +10,9 @@ class RpmMeter(QWidget):
                 super().__init__(parent)
                 self.global_x = global_x
                 self.global_y = global_y
-                self.rpm = 0
+                self.rpm = 0 
+                self.setAttribute(Qt.WA_TranslucentBackground, True)
+                self.setStyleSheet("background-color:transparent;")
 
         def RpmNeedle(self, painter):
                 pivot_x = 250 + self.global_x

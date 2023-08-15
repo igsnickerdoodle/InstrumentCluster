@@ -2,15 +2,14 @@ from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QVBoxLay
 from PyQt5.QtCore import Qt, QPoint, QPointF
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QPixmap, QRadialGradient, QBrush
 import math, sys
-from . import global_x, global_y
-## Components Import
-# from components.coolant_temp.coolant_singledisplay import CoolantGauge
-from components.speed.text import Speed
-# from components.afr.app_design_1 import AFR
-# from components.boost.boost_1 import BoostMeter
-# from components.oil.oil_temp_1 import OilMeter
-# from components.fuel.fuel_1 import FuelMeter
-from components.rpm.rpm_single_display import  RpmMeter
+from pathlib import Path
+
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
+
+from components.rpm.rpm_single_display import RpmMeter
+from designs.singledial import global_x, global_y
 
 class Background(QWidget):
     def __init__(self):
@@ -260,27 +259,23 @@ class Display(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(0, 0, 1024, 600)
-        # self.background = Background()
-        self.rpm_meter = RpmMeter()
-        # self.initUI()
-        # self.background.show()
-        self.rpm_meter.show()
-    # def initUI(self):  
-    #     main_layout = QVBoxLayout()
-    #     test_label = QLabel("Test in Display")
         
-
-        #main_layout.addWidget(Speed())
-        #main_layout.addWidget(AFR())
-        #main_layout.addWidget(BoostMeter())
-        #main_layout.addWidget(OilMeter())
-        #main_layout.addWidget(FuelMeter())
-        # main_layout.addWidget(self.rpm_meter)   
-        #main_layout.addWidget(CoolantGauge())  
-        # main_layout.addWidget(test_label)           
-
-        # self.background = Background()
-        # self.setLayout(main_layout)  # Set the layout directly on the Display widget
+        # Create the QVBoxLayout for Display
+        main_layout = QVBoxLayout(self)
+        
+        # Create and add the Background widget to the layout
+        self.background = Background()
+        main_layout.addWidget(self.background)
+        
+        # Create and add the RpmMeter (RpmNeedle) widget to the layout
+        self.rpm_meter = RpmMeter(self)
+        main_layout.addWidget(self.rpm_meter)
+        
+        # Set the layout for Display
+        self.setLayout(main_layout)
+        
+        # Ensure that the Display widget is transparent
+        self.setAttribute(Qt.WA_TranslucentBackground, False)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

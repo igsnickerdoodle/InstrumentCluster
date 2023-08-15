@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QTimer
 import sys
 
 ## Module Imports
-from designs.singledial.singledial import Background
+from designs.singledial.singledial import Background, Display
 #from components.arduino.arduino_serial import ArduinoSerial
 
 ## Import Value Update Fields
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         label = QLabel()
         self.setCentralWidget(label)
         layout = QGridLayout(label)
-        self.display = Background()
+        self.display = Display()
         self.display.setAttribute(Qt.WA_TranslucentBackground, True)
         # Grid (row=1, col=0, rowspan=1, colspan=2)       
         layout.addWidget(self.display, 1, 0, 1, 2)  
