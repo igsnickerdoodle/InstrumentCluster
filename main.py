@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QTimer
 import sys
 
 ## Module Imports
-from designs.singledial.singledial import Background, Display
+from designs.singledial.singledial import Display
 #from components.arduino.arduino_serial import ArduinoSerial
 
 ## Import Value Update Fields
@@ -17,8 +17,6 @@ from components.rpm.rpm_single_display import RpmMeter
 from components.oil.oil_temp_1 import OilMeter
 from components.coolant_temp.coolant_singledisplay import CoolantGauge
 from components.speed.gpsfile import gps
-
-
 
 # class ValueUpdate:
 #     def __init__(self):

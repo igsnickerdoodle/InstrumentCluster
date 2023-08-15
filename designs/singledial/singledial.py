@@ -10,8 +10,9 @@ sys.path.append(str(root_directory.resolve()))
 
 from components.rpm.rpm_single_display import RpmMeter
 from designs.singledial import global_x, global_y
+from components.speed.text import Speed
 
-class Background(QWidget):
+class Display(QWidget):
     def __init__(self):
         super().__init__()
         ## Initialize Modules
@@ -19,6 +20,8 @@ class Background(QWidget):
         self.global_y = global_y
         # Setup the swap displays
         # self.current_display = self.boost_display 
+        self.rpm_meter = RpmMeter(self)
+        self.speed = Speed(self)
 
         self.create_toggle_buttons()  # Ensure this method is defined
         self.indicator_light_cel = QLabel(self)
@@ -39,6 +42,8 @@ class Background(QWidget):
         self.drawIndicators(painter)
         self.drawCenterCircle(painter)
         self.top_center_bg(painter)
+        self.rpm_meter.RpmNeedle(painter)
+        self.speed.mph(painter)
 
         # self.current_display(painter, self.boost_value)
         # self.coolant_display.CoolantTemp(painter)
@@ -255,28 +260,6 @@ class Background(QWidget):
             self.foglights_on = True
         self.indicator_light_foglights.show()
        
-class Display(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setGeometry(0, 0, 1024, 600)
-        
-        # Create the QVBoxLayout for Display
-        main_layout = QVBoxLayout(self)
-        
-        # Create and add the Background widget to the layout
-        self.background = Background()
-        main_layout.addWidget(self.background)
-        
-        # Create and add the RpmMeter (RpmNeedle) widget to the layout
-        self.rpm_meter = RpmMeter(self)
-        main_layout.addWidget(self.rpm_meter)
-        
-        # Set the layout for Display
-        self.setLayout(main_layout)
-        
-        # Ensure that the Display widget is transparent
-        self.setAttribute(Qt.WA_TranslucentBackground, False)
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 

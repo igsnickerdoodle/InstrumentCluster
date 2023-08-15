@@ -2,9 +2,15 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPainter, QPen, QFont, QPainterPath, QFontMetrics
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-import math
+import math, sys
+from pathlib import Path
+from components.oil import update_oil_temp, global_y, global_x, text_labels
 
-from . import update_oil_temp, global_y, global_x, text_labels
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
+
+
 
 
 class OilMeter(QWidget):

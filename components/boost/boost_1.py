@@ -3,6 +3,12 @@ from PyQt5.QtGui import QPen, QFont, QColor
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from . import update_boost, global_y, global_x, text_labels
+from pathlib import Path
+import sys
+
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
 
 class BoostMeter(QWidget):
     def __init__(self, parent=None):

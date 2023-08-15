@@ -3,7 +3,12 @@ from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from . import update_afr, global_x, global_y, text_labels
-import math
+import math, sys
+from pathlib import Path
+
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
 
 class AFR(QWidget):
     def __init__(self, parent=None):

@@ -2,8 +2,13 @@ from PyQt5.QtCore import QPoint, QPointF, QSize
 from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont, QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
+import math, sys
+from pathlib import Path
 from . import update_coolant, global_x, global_y, text_labels
-import math
+
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
 
 class CoolantGauge(QWidget):
     def __init__(self, parent=None):

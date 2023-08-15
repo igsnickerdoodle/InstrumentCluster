@@ -2,8 +2,13 @@ from PyQt5.QtCore import QSize, QPoint, QPointF
 from PyQt5.QtGui import QPainter, QPen, QFont, QPixmap, QPainterPath
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-import math
-from . import update_fuel, global_x, global_y, text_labels
+import math, sys
+from components.fuel import update_fuel, global_x, global_y, text_labels
+from pathlib import Path
+
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
 
 class FuelMeter(QWidget):
     def __init__(self, parent=None):
