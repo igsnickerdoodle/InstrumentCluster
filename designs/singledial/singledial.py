@@ -1,28 +1,25 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QVBoxLayout
 from PyQt5.QtCore import Qt, QPoint, QPointF
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QPixmap, QRadialGradient, QBrush
-import math, sys
 from pathlib import Path
+import math, sys
 
+### Local component imports
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
-
 from components.rpm.rpm_single_display import RpmMeter
 from designs.singledial import global_x, global_y
 from components.speed.text import Speed
 
-class Display(QWidget):
-    def __init__(self):
-        super().__init__()
+class Background(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         ## Initialize Modules
         self.global_x = global_x
         self.global_y = global_y
         # Setup the swap displays
         # self.current_display = self.boost_display 
-        self.rpm_meter = RpmMeter(self)
-        self.speed = Speed(self)
-
         self.create_toggle_buttons()  # Ensure this method is defined
         self.indicator_light_cel = QLabel(self)
         self.indicator_light_highbeams = QLabel(self)
@@ -32,29 +29,14 @@ class Display(QWidget):
         self.cel_on = False
         self.highbeams_on = False
         self.foglights_on = False
-
         self.max_rpm_value = 8000
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        self.drawGradient(painter)
-        self.drawSideArcs(painter)
-        self.drawIndicators(painter)
-        self.drawCenterCircle(painter)
-        self.top_center_bg(painter)
-        self.rpm_meter.RpmNeedle(painter)
-        self.speed.mph(painter)
-
-        # self.current_display(painter, self.boost_value)
-        # self.coolant_display.CoolantTemp(painter)
-
     def create_toggle_buttons(self):
 
-        self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
-        self.toggle_button_center_top.clicked.connect(self.swap_display)
-        self.toggle_button_center_top.setGeometry(10, 170, 120, 40)  # Adjust the size and position as needed
-        self.toggle_button_center_top.setStyleSheet("background-color: red")
-        self.toggle_button_center_top.show()
+        # self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
+        # self.toggle_button_center_top.clicked.connect(self.swap_display)
+        # self.toggle_button_center_top.setGeometry(10, 170, 120, 40)  # Adjust the size and position as needed
+        # self.toggle_button_center_top.setStyleSheet("background-color: red")
+        # self.toggle_button_center_top.show()
 
         self.toggle_button_cel = QPushButton("Toggle CEL", self)
         self.toggle_button_cel.clicked.connect(self.swap_display_cel)
@@ -74,24 +56,23 @@ class Display(QWidget):
         self.toggle_button_foglights.setStyleSheet("background-color: red")
         self.toggle_button_foglights.show()     
     def top_center_bg(self, painter):
-        # Boost arc background
         boostbg_x = 35
         boostbg_y = 85
         boostbg_size = 430
-        shadowColor = QColor(8, 8, 8, 128)  # Semi-transparent black
+        shadowColor = QColor(8, 8, 8, 128)
         shadowOffset = 2
         painter.setPen(QPen(shadowColor, 20, Qt.SolidLine))
         painter.drawArc(boostbg_x + shadowOffset + self.global_x, boostbg_y + shadowOffset + self.global_y, boostbg_size, boostbg_size , 136 * 16, -91 * 16)
         painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
-        painter.drawArc(boostbg_x + self.global_x, boostbg_y + self.global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16)  
- 
-    def swap_display(self):
-        #print("Button clicked!")  # If this doesn't print, the button is not connected properly
-        if self.current_display == self.BoostGauge:
-            self.current_display = self.OilTemp
-        else:
-            self.current_display = self.BoostGauge
-        self.update()
+        painter.drawArc(boostbg_x + self.global_x, boostbg_y + self.global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16) 
+
+    # def swap_display(self):
+    #     #print("Button clicked!")  # If this doesn't print, the button is not connected properly
+    #     if self.current_display == self.BoostGauge:
+    #         self.current_display = self.OilTemp
+    #     else:
+    #         self.current_display = self.BoostGauge
+    #     self.update()
 
     def drawGradient(self, painter):
         arc_x = self.global_x - 30
@@ -115,8 +96,7 @@ class Display(QWidget):
         painter.drawArc(arc_x, arc_y, arc_width, arc_height, start_angle, span_angle)
         painter.drawArc(arc_x, arc_y, arc_width, arc_height, start_angle, span_angle)
 
-    def drawSideArcs(self, painter):
-        
+    def drawSideArcs(self, painter):    
         pen = QPen(QColor(26, 26, 26))
         pen.setWidth(18)  # Set line width
         painter.setPen(pen)
@@ -139,6 +119,7 @@ class Display(QWidget):
         radius = 225  # Radius of the circle
 
         painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                 
+
     def drawIndicators(self, painter):
         start_angle = -5  
         end_angle = 269  
@@ -259,7 +240,31 @@ class Display(QWidget):
             self.indicator_light_foglights.setPixmap(pixmap)
             self.foglights_on = True
         self.indicator_light_foglights.show()
-       
+
+
+class Display(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.rpm_meter = RpmMeter(self)
+        self.speed = Speed(self)
+        self.background = Background(self)
+        # Setup the swap displays
+        # self.current_display = self.boost_display
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Draw elements from Background
+        self.background.drawGradient(painter)
+        self.background.drawSideArcs(painter)
+        self.background.drawIndicators(painter)
+        self.background.drawCenterCircle(painter)
+        self.background.top_center_bg(painter)
+
+        self.rpm_meter.RpmNeedle(painter)
+        self.speed.mph(painter)
+        self.background.paintEvent(event)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 

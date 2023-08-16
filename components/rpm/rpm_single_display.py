@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPainter, QTransform, QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 import math, sys
+from components.rpm import global_x, global_y, update_rpm
 from pathlib import Path
 
 current_directory = Path(__file__).parent
