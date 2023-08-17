@@ -254,6 +254,7 @@ class Background(QWidget):
 class Display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         self.rpm_meter_display = rpm_display(self)
         self.speed_display = speed_display(self)
         self.background = Background(self)
@@ -264,7 +265,9 @@ class Display(QWidget):
         self.fuel_display = fuel_display(self)
         
         # Setup the swap displays
-        # self.current_display = self.boost_display
+        self.current_display = self.boost_display.widget
+        
+        boost_value = self.boost_display.boost_value
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -282,10 +285,21 @@ class Display(QWidget):
         self.speed_display.widget(painter)
         self.afr_display.widget(painter)
         self.coolant_display.widget(painter)
-        self.boost_display.widget(painter)
-        self.fuel_display.widget(painter)
-        self.oil_display.widget(painter)
+        self.fuel_display.widget(painter)  
+              
+        # self.boost_display.widget(painter)
+        # self.oil_display.widget(painter)
         
+        # Display swaps
+        self.current_display(painter)
+    
+    def swap_display(self):
+        #print("Button clicked!")  # If this doesn't print, the button is not connected properly
+        if self.current_display == self.boost_display:
+            self.current_display = self.oil_display
+        else:
+            self.current_display = self.boost_display
+        self.update()
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)

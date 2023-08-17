@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
         layout = QGridLayout(label)
         self.display = Display()
         self.display.setAttribute(Qt.WA_TranslucentBackground, True)
-        # Grid (row=1, col=0, rowspan=1, colspan=2)       
+               
         layout.addWidget(self.display, 1, 0, 1, 2)  
         palette = QPalette()
         palette.setColor(QPalette.Background, QColor('black'))
