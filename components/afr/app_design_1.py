@@ -2,25 +2,26 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPainter, QPainterPath, QPen, QFont
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
-from . import update_afr, global_x, global_y, text_labels
 import math, sys
-from pathlib import Path
 
+from pathlib import Path
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
+from components.afr import update_afr, global_x, global_y, text_labels
 
-class AFR(QWidget):
+
+class afr_display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.afr = 14.7
+        self.afr_value = 14.7
         self.coolant_x = 0
         self.coolant_y = 0
         self.global_x = global_x
         self.global_y = global_y
-        self.text_labels = text_labels
+        self.text_labels = "Nimbus Sans Bold", 8
 
-    def AFR(self, painter):
+    def widget(self, painter):
         start_angle = -45
         end_angle = 45
         major_length = 10

@@ -10,20 +10,18 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-class FuelMeter(QWidget):
+class fuel_display(QWidget):
     def __init__(self, parent=None):
             super().__init__(parent)
             self.global_x = global_x
             self.global_y = global_y
-            self.text_labels = text_labels
-
+            self.text_labels = "Nimbus Sans Bold", 8
             self.fuel_level = 0
-
             self.needle_color = Qt.red
             self.needle_size = 4
   
 
-    def needle(self, painter):
+    def widget(self, painter):
         
         start_angle = 298
         end_angle = 242
@@ -48,8 +46,8 @@ class FuelMeter(QWidget):
             warning_icon = warning_icon.scaled(scaled_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
             # Fine tune image x,y positions
-            image_x_position = self.config.global_x - 45
-            image_y_position = 460 + self.config.global_y 
+            image_x_position = self.global_x - 45
+            image_y_position = 460 + self.global_y 
 
             # Draw the image
             painter.drawPixmap(QPoint(image_x_position, image_y_position), warning_icon)
@@ -70,7 +68,7 @@ class FuelMeter(QWidget):
                 text_angle = indicator_angle + text_angle_offsets.get(value, 0)
                 text_x = pivot_x + text_radius * math.cos(math.radians(90 - text_angle))
                 text_y = pivot_y + text_radius * math.sin(math.radians(90 - text_angle))
-                font = QFont(self.text_labels)
+                font = QFont("Nimbus Sans Bold", 8)
                 painter.setFont(font)
                 painter.setPen(QPen(Qt.white))
                 painter.drawText(QPointF(text_x, text_y), text_labels[value])

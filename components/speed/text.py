@@ -9,16 +9,15 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-class Speed(QWidget):
+class speed_display(QWidget):
     def __init__(self, parent=None):
-        super(Speed, self).__init__(parent)
+        super(speed_display, self).__init__(parent)
         self.speed = 0
         self.global_x = 280
         self.global_y = 50 
         self.setAttribute(Qt.WA_TranslucentBackground, True)
 
-        
-    def mph(self, painter):
+    def widget(self, painter):
         pivot_x = 250 + self.global_x
         pivot_y = 450 + self.global_y
         

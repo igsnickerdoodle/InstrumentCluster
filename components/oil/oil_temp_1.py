@@ -13,19 +13,19 @@ sys.path.append(str(root_directory.resolve()))
 
 
 
-class OilMeter(QWidget):
+class oil_display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.global_x = global_x
         self.global_y = global_y
-        self.text_labels = text_labels
+        self.text_labels = "Nimbus Sans Bold", 8
 
         self.needle_color = Qt.red
         
         self.needle_size = 4
         self.oil_temp = 0
 
-    def needle(self, painter, *args, **kwargs):
+    def widget(self, painter, *args, **kwargs):
             start_angle = 230
             end_angle = 132
             major_length = 12

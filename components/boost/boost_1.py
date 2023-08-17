@@ -10,17 +10,17 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-class BoostMeter(QWidget):
+class boost_display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.boost_value = 0
         self.global_y = global_y
         self.global_x = global_x
-        self.text_labels = text_labels
+        self.text_labels = "Nimbus Sans Bold", 8
         self.boost_color = "red, blue, green"
 
 
-    def display(self, painter, *args, **kwargs):
+    def widget(self, painter, *args, **kwargs):
 
         boost_value = kwargs.get('boost_value', self.boost_value)
         text_x_offset = -5 
@@ -80,19 +80,19 @@ class BoostMeter(QWidget):
 
         # Draw the text labels
         painter.setPen(QColor(255, 255, 255))  
-        font = QFont(text_labels)
+        font = QFont("Nimbus Sans Bold", 8)
         font.setPointSize(8) 
         painter.setFont(font)
-        painter.drawText(int(pivot_text_psi_x + self.config.global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
-        painter.drawText(int(pivot_text_hg_x + self.config.global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
+        painter.drawText(int(pivot_text_psi_x + self.global_x + rect_size/2), int(pivot_text_max_y), "+30psi")  # Max value label
+        painter.drawText(int(pivot_text_hg_x + self.global_x - rect_size/2), int(pivot_text_max_y), "-30hg")  # Min value label
         if boost_value >= 0:
-            new_font = QFont(text_labels)
+            new_font = QFont("Nimbus Sans Bold", 8)
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 
                             int(pivot_y + rect_size/2 - pivot_text_center_y), f'+{boost_value}psi')  # Current value label
         else:
-            new_font = QFont(text_labels)
+            new_font = QFont("Nimbus Sans Bold", 8)
             new_font.setPointSize(8)
             painter.setFont(new_font)
             painter.drawText(int(pivot_text_center_x + text_x_offset), 

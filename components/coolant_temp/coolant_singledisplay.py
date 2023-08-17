@@ -10,12 +10,12 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-class CoolantGauge(QWidget):
+class coolant_display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.global_x = global_x
         self.global_y = global_y
-        self.text_labels = text_labels
+        self.text_labels = "Nimbus Sans Bold", 8
 
         self.coolant = 0
         self.coolant_x = 0 + self.global_x
@@ -23,8 +23,9 @@ class CoolantGauge(QWidget):
         
     def paintEvent(self, event):
         painter = QPainter(self)
-        self.CoolantTemp(painter)
-    def CoolantTemp(self, painter):
+        self.widget(painter)
+        
+    def widget(self, painter):
         start_angle = 62
         end_angle = 118
         major_length = 12

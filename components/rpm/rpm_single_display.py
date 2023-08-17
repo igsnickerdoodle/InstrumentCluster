@@ -10,7 +10,7 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-class RpmMeter(QWidget):
+class rpm_display(QWidget):
         def __init__(self, parent=None):
                 super().__init__(parent)
                 self.global_x = global_x
@@ -19,7 +19,7 @@ class RpmMeter(QWidget):
                 self.setAttribute(Qt.WA_TranslucentBackground, True)
                 self.setStyleSheet("background-color:transparent;")
 
-        def RpmNeedle(self, painter):
+        def widget(self, painter):
                 pivot_x = 250 + self.global_x
                 pivot_y = 300 + self.global_y
                 start_angle = -5
@@ -54,4 +54,4 @@ class RpmMeter(QWidget):
 
         def paintEvent(self, event):
                 painter = QPainter(self)
-                self.RpmNeedle(painter)
+                self.widget(painter)

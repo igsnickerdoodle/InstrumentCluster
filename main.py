@@ -9,14 +9,15 @@ from designs.singledial.singledial import Display
 #from components.arduino.arduino_serial import ArduinoSerial
 
 ## Import Value Update Fields
-from components.afr.app_design_1 import AFR
-from components.boost.boost_1 import BoostMeter
-from components.speed.text import Speed
-from components.fuel.fuel_1 import FuelMeter
-from components.rpm.rpm_single_display import RpmMeter
-from components.oil.oil_temp_1 import OilMeter
-from components.coolant_temp.coolant_singledisplay import CoolantGauge
+from components.afr.app_design_1 import afr_display
+from components.boost.boost_1 import boost_display
+from components.speed.text import speed_display
+from components.fuel.fuel_1 import fuel_display
+from components.rpm.rpm_single_display import rpm_display
+from components.oil.oil_temp_1 import oil_display
+from components.coolant_temp.coolant_singledisplay import coolant_display
 from components.speed.gpsfile import gps
+from components.speed.text  import speed_display
 
 # class ValueUpdate:
 #     def __init__(self):

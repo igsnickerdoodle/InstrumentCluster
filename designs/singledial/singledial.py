@@ -8,9 +8,16 @@ import math, sys
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
-from components.rpm.rpm_single_display import RpmMeter
 from designs.singledial import global_x, global_y
-from components.speed.text import Speed
+
+from components.rpm.rpm_single_display import rpm_display
+from components.speed.text import speed_display
+from components.afr.app_design_1 import afr_display
+from components.boost.boost_1 import boost_display
+from components.fuel.fuel_1 import fuel_display
+from components.oil.oil_temp_1 import oil_display
+from components.coolant_temp.coolant_singledisplay import coolant_display
+
 
 class Background(QWidget):
     def __init__(self, parent=None):
@@ -30,6 +37,7 @@ class Background(QWidget):
         self.highbeams_on = False
         self.foglights_on = False
         self.max_rpm_value = 8000
+        
     def create_toggle_buttons(self):
 
         # self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
@@ -55,6 +63,7 @@ class Background(QWidget):
         self.toggle_button_foglights.setGeometry(10, 110, 120, 40)
         self.toggle_button_foglights.setStyleSheet("background-color: red")
         self.toggle_button_foglights.show()     
+
     def top_center_bg(self, painter):
         boostbg_x = 35
         boostbg_y = 85
@@ -245,9 +254,15 @@ class Background(QWidget):
 class Display(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.rpm_meter = RpmMeter(self)
-        self.speed = Speed(self)
+        self.rpm_meter_display = rpm_display(self)
+        self.speed_display = speed_display(self)
         self.background = Background(self)
+        self.oil_display = oil_display(self)
+        self.afr_display = afr_display(self)
+        self.coolant_display = coolant_display(self)
+        self.boost_display = boost_display(self)
+        self.fuel_display = fuel_display(self)
+        
         # Setup the swap displays
         # self.current_display = self.boost_display
 
@@ -262,9 +277,16 @@ class Display(QWidget):
         self.background.drawCenterCircle(painter)
         self.background.top_center_bg(painter)
 
-        self.rpm_meter.RpmNeedle(painter)
-        self.speed.mph(painter)
-        self.background.paintEvent(event)
+        # Draw components
+        self.rpm_meter_display.widget(painter)
+        self.speed_display.widget(painter)
+        self.afr_display.widget(painter)
+        self.coolant_display.widget(painter)
+        self.boost_display.widget(painter)
+        self.fuel_display.widget(painter)
+        self.oil_display.widget(painter)
+        
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
