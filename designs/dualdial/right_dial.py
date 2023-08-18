@@ -16,6 +16,8 @@ class RightDisplay(QWidget):
         self.fuel = 0
         self.speed = 0
         self.oil_temp = 0
+
+        
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
