@@ -15,8 +15,10 @@ const int mapMaxValues[numPins] = {280, 280};
 
 bool isRunning = false;  // Flag to control whether main loop is executed
 
+float RPM = 0;  // Declare RPM as a global variable
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   for (int pin = 0; pin < numPins; pin++) {
     for (int i = 0; i < numReadings; i++) {
       readings[pin][i] = 0;
@@ -26,7 +28,6 @@ void setup() {
 }
 
 void loop() {
-  // Check for start or stop signal from Serial
   while (Serial.available()) {
     String command = Serial.readString();
     if (command.startsWith("START")) {
@@ -38,7 +39,7 @@ void loop() {
   }
 
   if (!isRunning) {
-    return;  // If isRunning is false, exit the loop
+    return; 
   }
 
   StaticJsonDocument<200> doc;
@@ -68,10 +69,11 @@ void loop() {
     }
   }
   
-  float RPM;
-  if (pulseTime(100000, RPM)) {
-    doc["RPM"] = (int)RPM / 2;  // Cast to int to exclude decimals
+  float newRPM;
+  if (pulseTime(100000, newRPM)) {
+    RPM = newRPM;  // Update RPM if new data is available
   }
+  doc["RPM"] = (int)RPM / 2;  // Always include RPM in the message
 
   serializeJson(doc, Serial);
   Serial.println();
@@ -81,7 +83,7 @@ boolean pulseTime (unsigned long duration, float& RPM) {
   static int lastInput = digitalRead(inPin);
   static unsigned long start = micros(), lastEventTime = start ; 
   static long count = -1 ; 
-  if ((micros() - start) < duration) {           // measure
+  if ((micros() - start) < duration) {   
     if (lastInput != digitalRead(inPin)) {
       lastInput = digitalRead(inPin);
       if (lastInput) {

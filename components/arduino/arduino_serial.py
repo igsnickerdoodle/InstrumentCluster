@@ -14,18 +14,15 @@ class ArduinoSerial:
         while self.serial.in_waiting:
             try:
                 line = self.serial.readline().decode(errors='replace').strip()
-                # Try to parse the line as JSON
                 json_line = json.loads(line)
-                # If the line is valid JSON, update the current values
                 self.current_values = json_line
-                print(self.current_values)  # Print the current values
+                print(self.current_values) 
             except json.JSONDecodeError:
-                # If the line is not valid JSON, ignore it
                 pass
             except serial.serialutil.SerialException:
                 print("Serial connection lost. Attempting to reconnect...")
                 try:
-                    self.serial.close()  # Close the serial connection before trying to reopen it
+                    self.serial.close()  ## Terminate connection if currently open
                     self.serial.open()
                 except Exception as e:
                     print("Failed to reconnect:", e)
@@ -36,16 +33,20 @@ class ArduinoSerial:
     def start_reading(self):
         self.is_reading = True
         time.sleep(2)  # delay for 2 seconds
-        self.serial.write(b'START\n')  # Send "START" command to Arduino
+        self.serial.write(b'START\n')  # Send "START" command to Arduino data stream
         while self.is_reading:
             self.read_values()
 
     def stop_reading(self):
         self.is_reading = False
-        self.serial.write(b'STOP\n')  # Send "STOP" command to Arduino
+        self.serial.write(b'STOP\n')  # Send "STOP" command to Arduino end data
         self.serial.close()
 
-arduino = ArduinoSerial('/dev/ttyACM0', 115200)  # Replace with your port and baud rate
+# Replace with your port and baud rate
+# For Windows check Device Manager. It will be a COM port
+# For Linux please check /dev/ and dmesg
+
+arduino = ArduinoSerial('COM3', 57600)  
 
 # Register the stop_reading function to be called on exit
 atexit.register(arduino.stop_reading)

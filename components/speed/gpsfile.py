@@ -2,7 +2,7 @@ import serial
 import pynmea2
 import time
 
-class Speedometer:
+class gps:
     def __init__(self, port='/dev/ttyUSB0', baudrate=9600, timeout=1):
         self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
         self.set_baud_rate(115200)
