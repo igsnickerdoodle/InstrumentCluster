@@ -1,16 +1,21 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSlider, QGroupBox
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer, QPoint
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
+from pathlib import Path
 import math, sys
 
-class Speedometer(QWidget):
-    def __init__(self):
-        super().__init__()
-        # Define additional properties if needed, e.g.:
+### Local component imports
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
+
+
+class RightDisplay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.fuel = 0
         self.speed = 0
         self.oil_temp = 0
-             
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -393,7 +398,7 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget()
 
         # Create a Speedometer instance
-        self.arcWidget = Speedometer()
+        self.arcWidget = RightDisplay()
 
         # Set the geometry of the MainWindow
         self.setGeometry(0, 0, 800, 480)

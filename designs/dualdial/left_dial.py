@@ -3,16 +3,29 @@ from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize, QTimer
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
 import math, sys
 
-class Tachometer(QWidget):
-    def __init__(self):
-        super().__init__()     
-   
-        ## Initialize default values
+### Local component imports
+current_directory = Path(__file__).parent
+root_directory = current_directory / '..' / '..'
+sys.path.append(str(root_directory.resolve()))
+
+
+class LeftDisplay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)                
+        # Create a QTimer to update the RPM value periodically
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_values)
+        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
         self.boost_value = 0
+        # Initial RPM value (set to 0)
         self.rpm = 0
+        # Initial Fuel Reading
         self.coolant = 0
+        
         self.afr_value = 14.7
         
+
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -24,6 +37,7 @@ class Tachometer(QWidget):
         self.CoolantTemp(painter)
         self.AFR(painter)
     
+
     def drawArcs(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         # Creates the Tachometer and Outline
@@ -138,6 +152,8 @@ class Tachometer(QWidget):
         painter.setPen(QPen(QColor(255, 255, 255), 3, Qt.SolidLine))
         painter.drawArc(40, 40, 420, 420, 315 * 16, 271 * 16)
 
+
+
     def BoostGauge(self, painter, boost_value, font_name="Nimbus Sans Bold",text_x_offset=-5):
         # Parameters for Arc
         pivot_x = 250
@@ -219,6 +235,8 @@ class Tachometer(QWidget):
         rect = QRect(90, 90, 220, 220)  # Define the area to be repainted (Boost gauge region)
         self.repaint(rect)  # Trigger a repaint of the specified region   
 
+
+
     def RpmNeedle(self, painter):
         pivot_x = 250
         pivot_y = 250
@@ -260,6 +278,8 @@ class Tachometer(QWidget):
 
     def repaint_rpm(self):
         self.update()
+
+
 
     def CoolantTemp(self, painter):
         # Define your bar here
@@ -460,15 +480,21 @@ class Tachometer(QWidget):
     def repaint_afr(self):
         self.update()
 
-    def update_data(self, data):
-        if "RPM" in data:
-            self.update_speed(data["RPM"])
-        if "Boost" in data:
-            self.update_oil_temp(data["Boost"])
-        if "AFR" in data:
-            self.update_fuel(data["AFR"])
-        if "Coolant Tempt" in data:
-            self.update_fuel(data["Coolant Temp"])
+
+
+    def update_values(self):
+        self.arduino.read_values()
+        current_values = self.arduino.current_values
+
+        if "RPM" in current_values:
+            self.update_rpm(current_values["RPM"])
+        if "Coolant Temp" in current_values:
+            self.update_coolant(current_values["Coolant Temp"])
+        if "Boost" in current_values:
+            self.update_boost(current_values["Boost"])  
+        if "AFR" in current_values:
+            self.update_afr(current_values["AFR"])  
+ 
 
 class MainWindow(QMainWindow):
     def __init__(self):
