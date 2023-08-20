@@ -22,24 +22,24 @@ class ArduinoSerial:
             except serial.serialutil.SerialException:
                 print("Serial connection lost. Attempting to reconnect...")
                 try:
-                    self.serial.close()  ## Terminate connection if currently open
+                    self.serial.close()
                     self.serial.open()
                 except Exception as e:
                     print("Failed to reconnect:", e)
-                return  # Exit the function to avoid getting stuck in a loop
+                return
             except Exception as e:
                 print(f"Error while reading values: {e}")
 
     def start_reading(self):
         self.is_reading = True
-        time.sleep(2)  # delay for 2 seconds
-        self.serial.write(b'START\n')  # Send "START" command to Arduino data stream
+        time.sleep(2) 
+        self.serial.write(b'START\n') 
         while self.is_reading:
             self.read_values()
 
     def stop_reading(self):
         self.is_reading = False
-        self.serial.write(b'STOP\n')  # Send "STOP" command to Arduino end data
+        self.serial.write(b'STOP\n')
         self.serial.close()
 
 # Replace with your port and baud rate

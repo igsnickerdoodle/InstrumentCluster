@@ -1,27 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QSlider, QGridLayout, QSpacerItem, QSizePolicy, QApplication, QMainWindow
-from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize, QTimer
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QApplication, QMainWindow
+from PyQt5.QtCore import Qt, QPoint, QPointF, QRect, QRectF, QSize
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
 import math, sys
-#from components.arduino_serial import arduino
-from arduino_serial import arduino
-class Tachometer(QWidget):
-    def __init__(self):
-        super().__init__()        
-        self.arduino = arduino       
-        # Create a QTimer to update the RPM value periodically
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_values)
-        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
-        # Set Default Boost Level
-        self.boost_value = 0
-        # Initial RPM value (set to 0)
-        self.rpm = 0
-        # Initial Fuel Reading
-        self.coolant = 0
-        
-        self.afr_value = 14.7
-        
 
+class LeftDisplay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)        
+        self.boost_value = 0
+        self.rpm = 0
+        self.coolant = 0
+        self.afr_value = 14.7
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -33,7 +21,6 @@ class Tachometer(QWidget):
         self.BoostGauge(painter, self.boost_value)
         self.CoolantTemp(painter)
         self.AFR(painter)
-    
 
     def drawArcs(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
@@ -231,50 +218,6 @@ class Tachometer(QWidget):
     def repaint_boost(self):
         rect = QRect(90, 90, 220, 220)  # Define the area to be repainted (Boost gauge region)
         self.repaint(rect)  # Trigger a repaint of the specified region   
-
-
-
-    def RpmNeedle(self, painter):
-        pivot_x = 250
-        pivot_y = 250
-
-        start_angle = -5
-        end_angle = 269
-        center_angle = (start_angle + end_angle) / 2
-        needle_radius = 165
-        angle_range = abs(end_angle - start_angle)
-        needle_angle = center_angle + (self.rpm / 8000) * angle_range
-
-        pixmap = QPixmap('C:/Users/justc/Documents/git/InstrumentCluster/dual-display/resources/rpmneedle.png')
-        
-
-        # Resize the pixmap
-        pixmap = pixmap.scaled(QSize(26, 90),Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-
-        # Calculate needle position
-        needle_x = pivot_x + needle_radius * math.cos(math.radians(needle_angle)) - pixmap.width() / 2
-        needle_y = pivot_y + needle_radius * math.sin(math.radians(needle_angle)) - pixmap.height() / 2
-
-        transform = QTransform()
-        transform.translate(needle_x + pixmap.width() / 2, needle_y + pixmap.height() / 2)
-        transform.rotate(-270)  # Initial rotation to align with angle = 0 upward.
-        transform.rotate(needle_angle)
-        transform.translate(-needle_x - pixmap.width() / 2, -needle_y - pixmap.height() / 2)
-
-        # Draw pixmap centered on pivot point
-        painter.setTransform(transform)
-        painter.drawPixmap(int(needle_x), int(needle_y), pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        # Reset transformation after drawing
-        painter.resetTransform()
-
-    def update_rpm(self, value):
-        self.rpm = int(value)
-        self.repaint_rpm()
-
-    def repaint_rpm(self):
-        self.update()
 
 
 
@@ -491,8 +434,6 @@ class Tachometer(QWidget):
             self.update_boost(current_values["Boost"])  
         if "AFR" in current_values:
             self.update_afr(current_values["AFR"])  
- 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -502,13 +443,13 @@ class MainWindow(QMainWindow):
 
 
         # Create a ArcWidget instance
-        self.arcWidget = Tachometer()
+        self.arcWidget = LeftDisplay()
 
         # Set the geometry of the MainWindow
         self.setGeometry(0, 0, 1920, 480)
 
         # Create a QWidget and set it as the central widget
-        central_widget = Tachometer()
+        central_widget = LeftDisplay()
         self.setCentralWidget(central_widget)
 
         # Create a QHBoxLayout, add the arc widget to it and add a stretch
@@ -518,13 +459,8 @@ class MainWindow(QMainWindow):
         
         # Set the layout of the central widget
         central_widget.setLayout(layout)
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-
-
     mainWin = MainWindow()
     mainWin.show()
-
     sys.exit(app.exec_())

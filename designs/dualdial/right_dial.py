@@ -2,30 +2,15 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
 from PyQt5.QtCore import Qt, QPointF, QSize, QTimer, QPoint
 from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath, QFont, QPixmap, QTransform, QFontMetrics
 import math, sys
-#from components.arduino_serial import arduino
-from arduino_serial import arduino
 
 
-
-class Speedometer(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.arduino = arduino
-        
-        # Create a QTimer to update the RPM value periodically
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_values)
-        self.timer.start(50)  # Update every 1000 milliseconds (1 second)
-
-
-        # Define additional properties if needed, e.g.:
+class RightDisplay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.fuel = 0
         self.speed = 0
         self.oil_temp = 0
-        
-      
-      
-        
+               
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -73,7 +58,6 @@ class Speedometer(QWidget):
             painter.setPen(indicator_pen)
             painter.drawLine(start_x, start_y, end_x, end_y)
 
-            # Add speed values as numbers for major indicators
             if speed_indicator % 10 == 0:
                 speed_value = speed_indicator
                 speed_value_x = int(pivot_x + (indicator_radius - 0 - number_offset) * math.cos(math.radians(indicator_angle)))
@@ -84,12 +68,10 @@ class Speedometer(QWidget):
                 fontMetrics = painter.fontMetrics()
                 textWidth = fontMetrics.horizontalAdvance(str(speed_value))
                 textHeight = fontMetrics.height()
-                # Adjust the x and y position considering the text dimensions
                 adjusted_x = int(speed_value_x - textWidth / 2)
                 adjusted_y = int(speed_value_y + textHeight / 2)
                 painter.drawText(adjusted_x, adjusted_y, str(speed_value))
 
-        # Creates the Tachometer and Outline
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(255, 255, 255), 2, Qt.SolidLine))
         painter.drawArc(40, 40, 420, 420, 315 * 16, 271 * 16)
@@ -135,7 +117,6 @@ class Speedometer(QWidget):
 
         pixmap = QPixmap('C:/Users/justc/Documents/git/InstrumentCluster/dual-display/resources/speedneedle.png')
 
-        # Resize the pixmap
         pixmap = pixmap.scaled(QSize(26, 90), Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         # Calculate needle position
