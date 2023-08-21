@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QVBoxLayout, QSlider, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
@@ -20,8 +21,7 @@ class background_rpm(QWidget):
         self.indicator_yvalue_a = 290
 
         self.indicator_color = QColor(255, 255, 255)
-
-        # self.slider_controls()
+        self.rpm_needle = rpm_widget()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -29,17 +29,17 @@ class background_rpm(QWidget):
         self.rpm_bg_indicators_c(painter)        
         self.rpm_bg_indicators_b(painter)
         self.rpm_bg_indicators_a(painter)
+        self.rpm_bg_b(painter)
         self.rpm_bg_text(painter)
-        self.rpm_needle(painter)
 
     def rpm_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
         painter.drawArc(30, 10, 460, 560, 115 * 16, 135 * 16)
-
+    def rpm_bg_b(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(36, 36, 36), 8, Qt.SolidLine))
-        painter.drawArc(20, 5, 460, 570, 112 * 16, 141 * 16)
+        painter.drawArc(25, 5, 460, 570, 115 * 16, 135 * 16)        
     def rpm_bg_indicators_a(self, painter):
         start_angle = 119
         end_angle = 237
@@ -47,7 +47,7 @@ class background_rpm(QWidget):
         angle_interval = total_angle_range / 8
 
         oblong_ratio = 500 / 510  
-        outer_radius_y = 320  
+        outer_radius_y = 310  
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_a
         inner_radius_x = outer_radius_x - (self.indicator_length_a * oblong_ratio) 
@@ -69,7 +69,7 @@ class background_rpm(QWidget):
         angle_interval = total_angle_range / num_intervals
 
         oblong_ratio = 500 / 510  
-        outer_radius_y = 320  
+        outer_radius_y = 310  
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_b
         inner_radius_x = outer_radius_x - (self.indicator_length_b * oblong_ratio) 
@@ -83,7 +83,6 @@ class background_rpm(QWidget):
             end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)))
             end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)))
             painter.drawLine(start_x, start_y, end_x, end_y)
-
     def rpm_bg_indicators_c(self, painter):
         # Draw indicator lines
         start_angle = 119
@@ -95,7 +94,7 @@ class background_rpm(QWidget):
         pivot_x = 330
         pivot_y = 290
         oblong_ratio = 500 / 510  # width/height ratio of the oblong shape
-        outer_radius_y = 320  
+        outer_radius_y = 310  
         outer_radius_x = outer_radius_y * oblong_ratio  
         inner_radius_y = outer_radius_y - self.indicator_length_c
         inner_radius_x = outer_radius_x - (self.indicator_length_c * oblong_ratio)  
@@ -114,7 +113,6 @@ class background_rpm(QWidget):
             end_y = int(pivot_y + outer_radius_y * math.sin(math.radians(angle)))
 
             painter.drawLine(start_x, start_y, end_x, end_y)
-
     def rpm_bg_text(self, painter):
         start_angle = 119
         end_angle = 236
@@ -138,9 +136,19 @@ class background_rpm(QWidget):
             
             # Display the text corresponding to each 1000 RPM step
             painter.drawText(text_x, text_y, str(i))
-
-
-    def rpm_needle(self, painter):
+    
+class rpm_widget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.rpm = 0
+        self.max_rpm_value = 8000
+        self.needle_length = 25
+        self.needle_width = 4
+        # self.slider_controls()
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        self.needle_widget(painter)
+    def needle_widget(self, painter):
         pivot_x = 340
         pivot_y = 290
         start_angle = 120 
@@ -163,7 +171,6 @@ class background_rpm(QWidget):
         self.repaint_rpm()
     def repaint_rpm(self):
         self.update()
-
     def slider_controls(self):
         main_layout = QVBoxLayout(self)
         
@@ -179,14 +186,6 @@ class background_rpm(QWidget):
         
         main_layout.addWidget(self.rpm_slider)
         self.setLayout(main_layout)
-    
-    # def rpm_indicators_major(self):
-
-    # def rpm_indicators_minor(self):
-
-    
-
-
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QVBoxLayout, QSlider, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
@@ -7,7 +8,6 @@ import math, sys
 class background_speed(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
         self.speed = 0
         self.max_speed_value = 210
         self.needle_length = 25
@@ -21,8 +21,8 @@ class background_speed(QWidget):
         self.indicator_yvalue_a = 290
 
         self.indicator_color = QColor(255, 255, 255)
+        self.speed_needle = speed_widget()
 
-        # self.slider_controls()
     def paintEvent(self, event):
         painter = QPainter(self)
         self.speed_bg_a(painter)
@@ -30,26 +30,28 @@ class background_speed(QWidget):
         self.speed_bg_indicators_b(painter)
         self.speed_bg_indicators_a(painter)
         self.speed_bg_text(painter)
-        self.speed_needle(painter)
+        self.speed_bg_b(painter)
+        self.speed_needle.speed_needle(painter)
 
     def speed_bg_a(self, painter):
-        # First arc
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(30, 10, 460, 560, 65 * 16, 135 * 16)
-
-        # Second arc
+        painter.drawArc(0, 10, 460, 560, 70 * 16, -135 * 16)
+    def speed_bg_b(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(36, 36, 36), 8, Qt.SolidLine))
-        painter.drawArc(20, 5, 460, 570, 62 * 16, 141 * 16)
+        painter.drawArc(5, 5, 460, 570, 72 * 16, -139  * 16)       
     def speed_bg_indicators_a(self, painter):
-        start_angle = 119
-        end_angle = 237
+        start_angle = 59
+        end_angle = -63
         total_angle_range = end_angle - start_angle
         angle_interval = total_angle_range / 10
 
-        oblong_ratio = 500 / 510  
-        outer_radius_y = 320  
+        offset_x = -161
+        offset_y = 0
+
+        oblong_ratio = 500 / 520  
+        outer_radius_y = 310  
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_a
         inner_radius_x = outer_radius_x - (self.indicator_length_a * oblong_ratio) 
@@ -58,20 +60,23 @@ class background_speed(QWidget):
 
         for i in range(11):
             angle = start_angle + i * angle_interval
-            start_x = int(self.indicator_xvalue_a + inner_radius_x * math.cos(math.radians(angle)))
-            start_y = int(self.indicator_yvalue_a + inner_radius_y * math.sin(math.radians(angle)))
-            end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)))
-            end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)))
+            start_x = int(self.indicator_xvalue_a + inner_radius_x * math.cos(math.radians(angle)) + offset_x)
+            start_y = int(self.indicator_yvalue_a + inner_radius_y * math.sin(math.radians(angle)) + offset_y)
+            end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)) + offset_x)
+            end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)) + offset_y)
             painter.drawLine(start_x, start_y, end_x, end_y)
     def speed_bg_indicators_b(self, painter):
-        start_angle = 119
-        end_angle = 237
+        start_angle = 59
+        end_angle = -63
         total_angle_range = end_angle - start_angle
-        num_intervals = 20  # For 0 to 200 speed in 10 speed steps
+        num_intervals = 20  
         angle_interval = total_angle_range / num_intervals
 
-        oblong_ratio = 500 / 510  
-        outer_radius_y = 320  
+        offset_x = -161
+        offset_y = 0
+
+        oblong_ratio = 500 / 520  
+        outer_radius_y = 310  
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_b
         inner_radius_x = outer_radius_x - (self.indicator_length_b * oblong_ratio) 
@@ -80,47 +85,48 @@ class background_speed(QWidget):
 
         for i in range(num_intervals + 1):  # +1 to include the 200 Speed indicator
             angle = start_angle + i * angle_interval
-            start_x = int(self.indicator_xvalue_a + inner_radius_x * math.cos(math.radians(angle)))
-            start_y = int(self.indicator_yvalue_a + inner_radius_y * math.sin(math.radians(angle)))
-            end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)))
-            end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)))
+            start_x = int(self.indicator_xvalue_a + inner_radius_x * math.cos(math.radians(angle)) + offset_x)
+            start_y = int(self.indicator_yvalue_a + inner_radius_y * math.sin(math.radians(angle)) + offset_y)
+            end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)) + offset_x)
+            end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)) + offset_y)
             painter.drawLine(start_x, start_y, end_x, end_y)
     def speed_bg_indicators_c(self, painter):
         # Draw indicator lines
-        start_angle = 119
-        end_angle = 237
+        start_angle = 59
+        end_angle = -63
         total_angle_range = end_angle - start_angle
         num_intervals = 40
         angle_interval = total_angle_range / num_intervals
 
-        pivot_x = 330
-        pivot_y = 290
-        oblong_ratio = 500 / 510  # width/height ratio of the oblong shape
-        outer_radius_y = 320  
+        offset_x = -161
+        offset_y = 0
+
+        oblong_ratio = 500 / 520  # width/height ratio of the oblong shape
+        outer_radius_y = 305  
         outer_radius_x = outer_radius_y * oblong_ratio  
         inner_radius_y = outer_radius_y - self.indicator_length_c
         inner_radius_x = outer_radius_x - (self.indicator_length_c * oblong_ratio)  
 
         painter.setPen(QPen(self.indicator_color, 2, Qt.SolidLine))
 
-        for i in range(num_intervals + 1):  # +1 to include the last indicator
+        for i in range(num_intervals + 1):
             angle = start_angle + i * angle_interval
-            start_x = int(pivot_x + inner_radius_x * math.cos(math.radians(angle)))
-            start_y = int(pivot_y + inner_radius_y * math.sin(math.radians(angle)))
-            end_x = int(pivot_x + outer_radius_x * math.cos(math.radians(angle)))
-            end_y = int(pivot_y + outer_radius_y * math.sin(math.radians(angle)))
+            start_x = int(self.indicator_xvalue_a + inner_radius_x * math.cos(math.radians(angle)) + offset_x)
+            start_y = int(self.indicator_yvalue_a + inner_radius_y * math.sin(math.radians(angle)) + offset_y)
+            end_x = int(self.indicator_xvalue_a + outer_radius_x * math.cos(math.radians(angle)) + offset_x)
+            end_y = int(self.indicator_yvalue_a + outer_radius_y * math.sin(math.radians(angle)) + offset_y)
 
             painter.drawLine(start_x, start_y, end_x, end_y)
     def speed_bg_text(self, painter):
-        start_angle = 119
-        end_angle = 236
+        start_angle = 59
+        end_angle = -63
         total_angle_range = end_angle - start_angle
         angle_interval = total_angle_range / 10
 
         vertical_offset = -35  
-        horizontal_offset = -5
-        oblong_ratio = 500 / 510  
-        outer_radius_y = 280 
+        horizontal_offset = -170
+        oblong_ratio = 500 / 550  
+        outer_radius_y = 275 
         outer_radius_x = outer_radius_y * oblong_ratio 
 
         # Set the font and color for the text
@@ -136,11 +142,23 @@ class background_speed(QWidget):
             
             painter.drawText(text_x, text_y, str(i*20))
 
+
+class speed_widget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.speed = 0
+        self.max_speed_value = 210
+        self.needle_length = 25
+        self.needle_width = 4
+        # self.slider_controls()
+    def paintEvent(self, painter):
+        painter = QPainter(self)
+        self.speed_needle(painter)
     def speed_needle(self, painter):
-        pivot_x = 340
+        pivot_x = 140
         pivot_y = 290
-        start_angle = 120 
-        end_angle = 242 
+        start_angle = 56 
+        end_angle = -65.5 
         angle_range = end_angle - start_angle
         radius_offset_y = 20       
         radius_offset_x = 22
@@ -176,6 +194,7 @@ class background_speed(QWidget):
         main_layout.addWidget(self.speed_slider)
         self.setLayout(main_layout)
   
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
