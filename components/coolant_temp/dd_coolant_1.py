@@ -8,14 +8,20 @@ class background_coolant(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.fuel = 0
-        self.fuel_value = coolant_temp()
+        self.coolant_widget = coolant_temp()
         self.slider_controls()
     def paintEvent(self, painter):
         painter = QPainter(self)
-        self.fuel_indicators(painter)
-        self.fuel_value.bar_widget(painter)  
+        # self.fuel_indicators(painter)
+        self.coolant_widget.bar_widget(painter) 
+        self.speed_bg_a(painter)
+        
+    def speed_bg_a(self, painter):
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
+        painter.drawArc(0, 10, 460, 560, 45 * 16, -135 * 16) 
 
-    def fuel_indicators(self, painter):
+    def coolant_indicators(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
 
         # Define ellipse parameters to match fuel_bg_a and bar_widget
@@ -34,11 +40,11 @@ class background_coolant(QWidget):
 
         # Indicator data for each fuel level
         indicators_data = {
-            100: {"offset_x": -30, "offset_y": 10, "color": "white", "length": 25},
+            100: {"offset_x": -30, "offset_y": 10, "color": "red", "length": 25},
             75: {"offset_x": -30, "offset_y": 10, "color": "white", "length": 22},
             50: {"offset_x": -28, "offset_y": 10, "color": "white", "length": 22},
             25: {"offset_x": -28, "offset_y": 8, "color": "white", "length": 22},
-            0: {"offset_x": -40, "offset_y": 5, "color": "red", "length": 30}
+            0: {"offset_x": -40, "offset_y": 5, "color": "white", "length": 30}
         }
 
         for level, data in indicators_data.items():
@@ -68,30 +74,32 @@ class background_coolant(QWidget):
         main_layout.addItem(spacer)
         
         # Create a slider with a range from 0 to 100
-        self.fuel_slider = QSlider(Qt.Horizontal)
-        self.fuel_slider.setRange(0, 100)
-        self.fuel_slider.valueChanged.connect(self.update_fuel)
-        self.fuel_slider.setStyleSheet("background-color: white;")
+        self.coolant_slider = QSlider(Qt.Horizontal)
+        self.coolant_slider.setRange(0, 260)
+        self.coolant_slider.valueChanged.connect(self.update_coolant)
+        self.coolant_slider.setStyleSheet("background-color: white;")
         
-        main_layout.addWidget(self.fuel_slider)
-        main_layout.addWidget(self.fuel_value)
+        main_layout.addWidget(self.coolant_slider)
+        main_layout.addWidget(self.coolant_widget)
 
         self.setLayout(main_layout)
-    def update_fuel(self, value):
-        self.fuel_value.fuel = int(value)
-        self.repaint_fuel()
-    def repaint_fuel(self):
+    def update_coolant(self, value):
+        self.coolant_widget.coolant = int(value)
+        self.repaint_coolant()
+    def repaint_coolant(self):
         self.update()
+
 class coolant_temp(QWidget):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.fuel = 0
-        self.max_fuel_value = 100 
+        self.coolant = 0
+        self.coolant_max_value = 260
+        
     def bar_widget(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         x, y, width, height = 55, 20, 460, 560
-        start_angle = 250 * 16
-        total_angle = -55 * 16
+        start_angle = -55 * 16
+        total_angle = 40 * 16
         num_segments = 20
         segment_angle = total_angle // num_segments  # adjusted segment angle
 
@@ -99,16 +107,18 @@ class coolant_temp(QWidget):
         painter.setPen(QPen(QColor(200, 200, 200, 0), 5, Qt.SolidLine))
         painter.drawArc(x, y, width, height, start_angle, total_angle)
 
-        # Calculate the number of filled segments based on the fuel level
-        filled_segments = int((self.fuel / 100) * 10) * 2  # Multiply by 2 to account for transparent segments
+        # Calculate the number of filled segments based on the coolant level
+        filled_segments = int((self.coolant / self.coolant_max_value) * num_segments)
 
         current_angle = start_angle
-        for i in range(filled_segments):
+        for i in range(2 * filled_segments):  # 2 times because for every filled segment, there's a transparent segment
             # Determine if the segment should be colored or transparent
             is_colored = i % 2 == 0
 
             if is_colored:
-                segment_value = (i // 2 + 1) * 10  # This gives the fuel value represented by the current segment/block
+                segment_value_ratio = (i // 2 + 1) / num_segments
+                segment_value = segment_value_ratio * self.coolant_max_value
+
                 if segment_value <= 30:
                     painter.setPen(QPen(QColor(255, 0, 0), 5, Qt.SolidLine))  # Red
                 else:
@@ -118,6 +128,7 @@ class coolant_temp(QWidget):
 
             painter.drawArc(x, y, width, height, current_angle, segment_angle)
             current_angle += segment_angle
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainWin = background_coolant()
