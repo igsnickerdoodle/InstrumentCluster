@@ -19,7 +19,7 @@ class background_coolant(QWidget):
     def speed_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(0, 10, 460, 560, 45 * 16, -135 * 16) 
+        painter.drawArc(0, 10, 460, 560, 65 * 16, -135 * 16)
 
     def coolant_indicators(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
@@ -75,7 +75,7 @@ class background_coolant(QWidget):
         
         # Create a slider with a range from 0 to 100
         self.coolant_slider = QSlider(Qt.Horizontal)
-        self.coolant_slider.setRange(0, 260)
+        self.coolant_slider.setRange(0, 320)
         self.coolant_slider.valueChanged.connect(self.update_coolant)
         self.coolant_slider.setStyleSheet("background-color: white;")
         
@@ -97,10 +97,10 @@ class coolant_temp(QWidget):
         
     def bar_widget(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-        x, y, width, height = 55, 20, 460, 560
-        start_angle = -55 * 16
-        total_angle = 40 * 16
-        num_segments = 20
+        x, y, width, height = 25, 25, 460, 560
+        start_angle = -65 * 16
+        total_angle = 25 * 16
+        num_segments = 10
         segment_angle = total_angle // num_segments  # adjusted segment angle
 
         # Draw the background arc (grayed out portion)
@@ -119,7 +119,7 @@ class coolant_temp(QWidget):
                 segment_value_ratio = (i // 2 + 1) / num_segments
                 segment_value = segment_value_ratio * self.coolant_max_value
 
-                if segment_value <= 30:
+                if segment_value >= 240:
                     painter.setPen(QPen(QColor(255, 0, 0), 5, Qt.SolidLine))  # Red
                 else:
                     painter.setPen(QPen(QColor(255, 255, 255), 5, Qt.SolidLine))
