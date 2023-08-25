@@ -4,6 +4,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 import math, sys
 
+global_x = -30
+global_y = 0
+
 class background_coolant(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -19,13 +22,13 @@ class background_coolant(QWidget):
     def speed_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(0, 10, 460, 560, 65 * 16, -135 * 16)
+        painter.drawArc(0 + global_x, 10 + global_y, 460, 560, 65 * 16, -135 * 16)
 
     def coolant_indicators(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
 
         # Define ellipse parameters to match fuel_bg_a and bar_widget
-        x, y, width, height = 55, 20, 460, 560
+        x, y, width, height = 55 + global_x, 20 + global_y, 460, 560
         start_angle = 195 * 16
         total_angle = 55 * 16
         
@@ -97,7 +100,7 @@ class coolant_temp(QWidget):
         
     def bar_widget(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-        x, y, width, height = 25, 25, 460, 560
+        x, y, width, height = 25 + global_x, 25 + global_y, 460, 560
         start_angle = -65 * 16
         total_angle = 25 * 16
         num_segments = 10

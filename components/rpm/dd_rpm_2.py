@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 import math, sys
 
+global_x = 0
+global_y = 0
 
 class background_rpm(QWidget):
     def __init__(self, parent=None):
@@ -17,8 +19,8 @@ class background_rpm(QWidget):
         self.indicator_length_b = 13
         self.indicator_length_c = 6
 
-        self.indicator_xvalue_a = 375
-        self.indicator_yvalue_a = 290
+        self.indicator_xvalue_a = 375 + global_x
+        self.indicator_yvalue_a = 280 + global_y
 
         self.rpm_font_size = 12
 
@@ -39,11 +41,11 @@ class background_rpm(QWidget):
     def rpm_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(72, 10, 460, 560, 115 * 16, 135 * 16)
+        painter.drawArc(72 + global_x, 0 + global_y, 460, 560, 115 * 16, 135 * 16)
     def rpm_bg_b(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(36, 36, 36), 8, Qt.SolidLine))
-        painter.drawArc(69, 5, 460, 570, 115 * 16, 135 * 16)        
+        painter.drawArc(69 + global_x,-5 + global_y, 460, 570, 115 * 16, 135 * 16)        
     def rpm_bg_indicators_a(self, painter):
         start_angle = 119
         end_angle = 237
@@ -51,7 +53,7 @@ class background_rpm(QWidget):
         angle_interval = total_angle_range / 8
 
         oblong_ratio = 500 / 510  
-        outer_radius_y = 310  
+        outer_radius_y = 310
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_a
         inner_radius_x = outer_radius_x - (self.indicator_length_a * oblong_ratio) 
@@ -178,18 +180,18 @@ class rpm_widget(QWidget):
         painter = QPainter(self)
         self.bar_widget(painter)
     def bar_widget(self, painter):
-        pivot_x = 375
-        pivot_y = 290
+        pivot_x = 378 + global_x
+        pivot_y = 280 + global_y
         bar_width = 17 
-        bar_height = 300
+        bar_height = 289
         fill_percentage = self.rpm / self.max_rpm_value
         ellipse_rect = QtCore.QRectF(pivot_x - bar_height, pivot_y - bar_height, 2 * bar_height, 2 * bar_height)
-        start_angle = 240 * 16
-        end_angle = 124 * 16  
+        start_angle = 238 * 16
+        end_angle = 126 * 16  
         span_angle = int(fill_percentage * (end_angle - start_angle)) 
         painter.setPen(QPen(QColor(200, 200, 200, 0), bar_width, Qt.SolidLine))
         painter.drawArc(ellipse_rect, start_angle, end_angle - start_angle)
-        painter.setPen(QPen(QColor(130, 180, 187), bar_width, Qt.SolidLine))
+        painter.setPen(QPen(QColor(255, 255, 255), bar_width, Qt.SolidLine))
         painter.drawArc(ellipse_rect, start_angle, span_angle)
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):

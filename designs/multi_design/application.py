@@ -1,14 +1,14 @@
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QSizePolicy, QVBoxLayout, QSlider, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QPen, QColor
 from pathlib import Path
 import sys
 
-### Local component imports
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
-from components.speed.dd_speed_1 import background_speed, speed_widget
+from components.speed.dd_speed_2 import background_speed, speed_widget
 from components.rpm.dd_rpm_2 import background_rpm, rpm_widget
 from components.fuel.dd_fuel_1 import background_fuel, fuel_widget
 from components.coolant_temp.dd_coolant_1 import background_coolant, coolant_temp
@@ -34,11 +34,27 @@ class DualDisplay(QWidget):
         layout.addWidget(self.right_display)
         self.setLayout(layout)
         self.control_test = ControlTest(self.left_display.rpm_widget,self.right_display.speed_widget,self.left_display.fuel_widget,self.right_display.coolant_widget, self)
-    def toggle_grid(self):
-        """Toggle the visibility of the grid."""
-        self.show_grid = not self.show_grid
-        self.update()  # Trigger a repaint
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        self.draw_grid(painter)
+    def draw_grid(self, painter):
+        width = self.width()
+        height = self.height()
 
+        # Grid settings
+        grid_color = QColor(100, 100, 100)  # Light gray for grid
+        grid_spacing = 10  # Spacing for the 5x5 grid
+
+        # Set pen for the grid
+        painter.setPen(QPen(grid_color, 1, Qt.SolidLine))
+
+        # Draw vertical lines
+        for x in range(0, width, grid_spacing):
+            painter.drawLine(x, 0, x, height)
+
+        # Draw horizontal lines
+        for y in range(0, height, grid_spacing):
+            painter.drawLine(0, y, width, y)   
 class RightDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -47,8 +63,7 @@ class RightDisplay(QWidget):
         self.speed_widget = speed_widget()
         self.background_coolant = background_coolant()
         self.coolant_widget = coolant_temp()
-                
-        
+                      
     def paintEvent(self, event):
         painter = QPainter(self)
         ## Paint Speedometer
@@ -58,7 +73,7 @@ class RightDisplay(QWidget):
         self.background_speed.speed_bg_indicators_c(painter)
         self.background_speed.speed_bg_text(painter)
         self.background_speed.speed_bg_b(painter)
-        self.speed_widget.speed_needle(painter)
+        self.speed_widget.speed_widget(painter)
         ## Paint Coolant
         self.coolant_widget.bar_widget(painter)
                

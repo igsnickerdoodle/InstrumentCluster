@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 import math, sys
 
+global_x = -30
+global_y = 0
 
 class background_speed(QWidget):
     def __init__(self, parent=None):
@@ -36,19 +38,19 @@ class background_speed(QWidget):
     def speed_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(0, 10, 460, 560, 70 * 16, -135 * 16)
+        painter.drawArc(global_x, 0 + global_y, 460, 560, 70 * 16, -135 * 16)
     def speed_bg_b(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(36, 36, 36), 8, Qt.SolidLine))
-        painter.drawArc(5, 5, 460, 570, 72 * 16, -139  * 16)       
+        painter.drawArc(5 + global_x, -5 + global_y, 460, 570, 72 * 16, -139  * 16)       
     def speed_bg_indicators_a(self, painter):
         start_angle = 59
         end_angle = -63
         total_angle_range = end_angle - start_angle
         angle_interval = total_angle_range / 10
 
-        offset_x = -161
-        offset_y = 0
+        offset_x = -161 + global_x
+        offset_y = -5 + global_y
 
         oblong_ratio = 500 / 520  
         outer_radius_y = 310  
@@ -72,8 +74,8 @@ class background_speed(QWidget):
         num_intervals = 20  
         angle_interval = total_angle_range / num_intervals
 
-        offset_x = -161
-        offset_y = 0
+        offset_x = -161 + global_x
+        offset_y = -5 + global_y
 
         oblong_ratio = 500 / 520  
         outer_radius_y = 310  
@@ -98,8 +100,8 @@ class background_speed(QWidget):
         num_intervals = 40
         angle_interval = total_angle_range / num_intervals
 
-        offset_x = -161
-        offset_y = 0
+        offset_x = -161 + global_x
+        offset_y = -5 + global_y
 
         oblong_ratio = 500 / 520  # width/height ratio of the oblong shape
         outer_radius_y = 305  
@@ -123,8 +125,8 @@ class background_speed(QWidget):
         total_angle_range = end_angle - start_angle
         angle_interval = total_angle_range / 10
 
-        vertical_offset = -35  
-        horizontal_offset = -170
+        vertical_offset = -35 + global_y 
+        horizontal_offset = -170 + global_x
         oblong_ratio = 500 / 550  
         outer_radius_y = 275 
         outer_radius_x = outer_radius_y * oblong_ratio 
@@ -142,7 +144,6 @@ class background_speed(QWidget):
             
             painter.drawText(text_x, text_y, str(i*20))
 
-
 class speed_widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -155,8 +156,8 @@ class speed_widget(QWidget):
         painter = QPainter(self)
         self.speed_needle(painter)
     def speed_needle(self, painter):
-        pivot_x = 140
-        pivot_y = 290
+        pivot_x = 140 + global_x
+        pivot_y = 290 + global_y
         start_angle = 56 
         end_angle = -65.5 
         angle_range = end_angle - start_angle
