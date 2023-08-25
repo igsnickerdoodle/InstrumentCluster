@@ -17,22 +17,23 @@ class background_coolant(QWidget):
         painter = QPainter(self)
         # self.fuel_indicators(painter)
         self.coolant_widget.bar_widget(painter) 
-        self.speed_bg_a(painter)
-        
+        self.coolant_indicators(painter)
+        self.speed_bg_a(painter)      
     def speed_bg_a(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(76, 76, 76), 15, Qt.SolidLine))
-        painter.drawArc(0 + global_x, 10 + global_y, 460, 560, 65 * 16, -135 * 16)
-
+        painter.drawArc(global_x, 0 + global_y, 460, 560, 70 * 16, -135 * 16)
+        
+    def coolant_bar(self, painter):
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(QPen(QColor(255, 255, 255), 15, Qt.SolidLine))
+        painter.drawArc(global_x, 0 + global_y, 460, 560, 70 * 16, -135 * 16)
+        
     def coolant_indicators(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-
-        # Define ellipse parameters to match fuel_bg_a and bar_widget
         x, y, width, height = 55 + global_x, 20 + global_y, 460, 560
-        start_angle = 195 * 16
-        total_angle = 55 * 16
-        
-        # Calculate the angles for each fuel level
+        start_angle = -55 * 16
+        total_angle = 45 * 16
         angles = {
             100: start_angle,
             75: start_angle + 0.25 * total_angle,
@@ -40,14 +41,12 @@ class background_coolant(QWidget):
             25: start_angle + 0.75 * total_angle,
             0: start_angle + total_angle
         }
-
-        # Indicator data for each fuel level
         indicators_data = {
-            100: {"offset_x": -30, "offset_y": 10, "color": "red", "length": 25},
-            75: {"offset_x": -30, "offset_y": 10, "color": "white", "length": 22},
-            50: {"offset_x": -28, "offset_y": 10, "color": "white", "length": 22},
-            25: {"offset_x": -28, "offset_y": 8, "color": "white", "length": 22},
-            0: {"offset_x": -40, "offset_y": 5, "color": "white", "length": 30}
+            100: {"offset_x": -40, "offset_y": 15, "color": "white", "length": 25},
+            75: {"offset_x": -35, "offset_y": 15, "color": "white", "length": 22},
+            50: {"offset_x": -35, "offset_y": 25, "color": "white", "length": 22},
+            25: {"offset_x": -33, "offset_y": 30, "color": "white", "length": 22},
+            0: {"offset_x": -36, "offset_y": 45, "color": "white", "length": 30}
         }
 
         for level, data in indicators_data.items():
@@ -96,13 +95,13 @@ class coolant_temp(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.coolant = 0
-        self.coolant_max_value = 260
+        self.coolant_max_value = 320
         
     def bar_widget(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
-        x, y, width, height = 25 + global_x, 25 + global_y, 460, 560
-        start_angle = -65 * 16
-        total_angle = 25 * 16
+        x, y, width, height = 25 + global_x, 15 + global_y, 460, 560
+        start_angle = -60 * 16
+        total_angle = 20 * 16
         num_segments = 10
         segment_angle = total_angle // num_segments  # adjusted segment angle
 

@@ -83,11 +83,8 @@ class background_rpm(QWidget):
         outer_radius_x = outer_radius_y * oblong_ratio 
         inner_radius_y = outer_radius_y - self.indicator_length_b
         inner_radius_x = outer_radius_x - (self.indicator_length_b * oblong_ratio) 
-
-        # Determine the indicator number from which the color should be red
         redline_indicator = int(math.ceil(self.dynamic_redline / 500.0))
-
-        for i in range(num_intervals + 1):  # +1 to include the 8000 RPM indicator
+        for i in range(num_intervals + 1):
             if i >= redline_indicator:
                 painter.setPen(QPen(Qt.red, 2, Qt.SolidLine))
             else:
@@ -110,12 +107,10 @@ class background_rpm(QWidget):
         outer_radius_x = outer_radius_y * oblong_ratio  
         inner_radius_y = outer_radius_y - self.indicator_length_c
         inner_radius_x = outer_radius_x - (self.indicator_length_c * oblong_ratio)  
-
-        # Determine the indicator number from which the color should be red
         redline_indicator = int(math.ceil(self.dynamic_redline / 100.0))
-        for i in range(num_intervals + 1):  # +1 to include the last indicator
+        for i in range(num_intervals + 1):  
             self.max_rpm_value = i * 100
-            if self.max_rpm_value % 500 == 0:  # Check if it's a multiple of 500
+            if self.max_rpm_value % 500 == 0: 
                 continue 
             if i >= redline_indicator:
                 painter.setPen(QPen(Qt.red, 2, Qt.SolidLine))
@@ -187,11 +182,11 @@ class rpm_widget(QWidget):
         fill_percentage = self.rpm / self.max_rpm_value
         ellipse_rect = QtCore.QRectF(pivot_x - bar_height, pivot_y - bar_height, 2 * bar_height, 2 * bar_height)
         start_angle = 238 * 16
-        end_angle = 126 * 16  
+        end_angle = 125 * 16  
         span_angle = int(fill_percentage * (end_angle - start_angle)) 
         painter.setPen(QPen(QColor(200, 200, 200, 0), bar_width, Qt.SolidLine))
         painter.drawArc(ellipse_rect, start_angle, end_angle - start_angle)
-        painter.setPen(QPen(QColor(255, 255, 255), bar_width, Qt.SolidLine))
+        painter.setPen(QPen(QColor(200, 200, 200), bar_width, Qt.SolidLine))
         painter.drawArc(ellipse_rect, start_angle, span_angle)
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):

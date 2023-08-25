@@ -1,7 +1,7 @@
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QSizePolicy, QVBoxLayout, QSlider, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QSizePolicy, QVBoxLayout, QSlider, QLabel, QFrame
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter, QPen, QColor
+from PyQt5.QtGui import QPainter, QPen, QColor, QPainterPath
 from pathlib import Path
 import sys
 
@@ -21,22 +21,29 @@ class DualDisplay(QWidget):
         self.setFixedSize(self.STATIC_WIDTH, self.STATIC_HEIGHT)
         self.setStyleSheet("background-color: black;")
         
-        self.right_display= RightDisplay(self)
+        self.right_display = RightDisplay(self)
         self.left_display = LeftDisplay(self)
-        
-        # Setting size policies
-        self.right_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.left_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.center_display = CenterDisplay(self)
 
-        # Setting up layout
-        layout = QHBoxLayout(self)
-        layout.addWidget(self.left_display)
-        layout.addWidget(self.right_display)
-        self.setLayout(layout)
+
+        # Define and set the widths for each display
+        LEFT_WIDTH = 480
+        CENTER_WIDTH = 200
+        RIGHT_WIDTH = 480
+
+        self.left_display.setFixedSize(LEFT_WIDTH, self.STATIC_HEIGHT)
+        self.center_display.setFixedSize(CENTER_WIDTH, self.STATIC_HEIGHT)
+        self.right_display.setFixedSize(RIGHT_WIDTH, self.STATIC_HEIGHT)
+
+        # Position the displays based on their widths
+        self.left_display.move(-10, 0)
+        self.center_display.move(375, 100)
+        self.right_display.move(520, 0)
+
         self.control_test = ControlTest(self.left_display.rpm_widget,self.right_display.speed_widget,self.left_display.fuel_widget,self.right_display.coolant_widget, self)
     def paintEvent(self, event):
         painter = QPainter(self)
-        self.draw_grid(painter)
+        # self.draw_grid(painter)
     def draw_grid(self, painter):
         width = self.width()
         height = self.height()
@@ -67,16 +74,19 @@ class RightDisplay(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         ## Paint Speedometer
+        self.speed_widget.bar_widget(painter)
+        self.speed_widget.text_widget(painter)
+
         self.background_speed.speed_bg_a(painter)
         self.background_speed.speed_bg_indicators_a(painter)
         self.background_speed.speed_bg_indicators_b(painter)
         self.background_speed.speed_bg_indicators_c(painter)
         self.background_speed.speed_bg_text(painter)
         self.background_speed.speed_bg_b(painter)
-        self.speed_widget.speed_widget(painter)
         ## Paint Coolant
         self.coolant_widget.bar_widget(painter)
-               
+        self.background_coolant.coolant_indicators(painter)
+              
 class LeftDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -100,9 +110,26 @@ class LeftDisplay(QWidget):
         self.background_fuel.fuel_indicators(painter)
         self.fuel_widget.bar_widget(painter)       
 
+
 class CenterDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.custom_width = 400
+        self.custom_height = 150
+        self.setFixedSize(self.custom_width, self.custom_height)
+    def paintEvent(self, event):
+        painter = QPainter(self)
+
+        # Set the brush for the background
+        painter.setBrush(QColor(0, 0, 0))  # Black color
+        painter.setPen(QPen(QColor(255, 255, 255), 4))  # White color with 2 pixel width for the border
+
+        # Draw the rectangle with the black background and white border
+        painter.drawRect(1, 1, self.custom_width - 2, self.custom_height - 2)
+
+        painter.end()
+
+        
 class ControlTest(QWidget):
     def __init__(self, rpm_widget_instance, speed_widget_instance, fuel_widget_instance, coolant_widget_instance, main_display_instance, parent=None):
         super().__init__(parent)
@@ -174,7 +201,6 @@ class ControlTest(QWidget):
         self.repaint_coolant()
     def repaint_coolant(self):
         self.main_display.repaint()
-        
 class GridWidget(QWidget):
     def __init__(self, grid_pixel_size=10, parent=None):
         super().__init__(parent)
@@ -216,7 +242,6 @@ class GridWidget(QWidget):
     def resizeEvent(self, event):
         """Override the resizeEvent to redraw the grid when the widget is resized."""
         self.update()
-     
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainWin = DualDisplay()
