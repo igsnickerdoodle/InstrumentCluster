@@ -29,7 +29,6 @@ class background_speed(QWidget):
         painter = QPainter(self)
         # self.draw_grid(painter)
         self.speed_needle.bar_widget(painter)
-        self.speed_needle.text_widget(painter)
         self.speed_bg_a(painter)
         self.speed_bg_indicators_c(painter)        
         self.speed_bg_indicators_b(painter)
@@ -176,7 +175,8 @@ class speed_widget(QWidget):
         self.needle_width = 4
     def paintEvent(self, painter):
         painter = QPainter(self)
-        self.speed_widget(painter)
+        self.bar_widget(painter)
+        self.text_widget(painter)
     def bar_widget(self, painter):
         painter.setRenderHint(QPainter.Antialiasing)
         pivot_x = 220 + global_x
@@ -226,6 +226,9 @@ class speed_widget(QWidget):
         # draw suffix
         painter.setFont(font_suffix)
         painter.drawText(int(text_x_suffix), int(text_y_suffix), " mph")
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
