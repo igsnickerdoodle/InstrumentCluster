@@ -9,6 +9,7 @@ import sys
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
+
 from components.speed.dd_speed_2 import background_speed, speed_widget
 from components.rpm.dd_rpm_2 import background_rpm, rpm_widget
 from components.fuel.dd_fuel_1 import background_fuel, fuel_widget
@@ -64,6 +65,8 @@ class instrumentcluster(QWidget):
             painter.drawLine(0, y, width, y)
         painter.end()   
 
+
+
 class RightDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -74,6 +77,7 @@ class RightDisplay(QWidget):
         self.coolant_widget = coolant_temp()
     def paintEvent(self, event):
         painter = QPainter(self)
+
         ## Paint Speedometer
         self.speed_widget.bar_widget(painter)
         self.speed_widget.text_widget(painter)
@@ -88,6 +92,8 @@ class RightDisplay(QWidget):
         self.coolant_widget.bar_widget(painter)
         self.background_coolant.coolant_indicators(painter)
 
+
+
 class LeftDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -98,6 +104,7 @@ class LeftDisplay(QWidget):
         self.fuel_widget = fuel_widget()
     def paintEvent(self, event):
         painter = QPainter(self)
+        
         self.background_rpm.rpm_bg_a(painter)
         self.rpm_widget.bar_widget(painter)
         self.background_rpm.rpm_bg_indicators_a(painter)
@@ -108,6 +115,8 @@ class LeftDisplay(QWidget):
 
         self.background_fuel.fuel_indicators(painter)
         self.fuel_widget.bar_widget(painter)       
+
+
 
 class CenterDisplay(QWidget):
     def __init__(self, parent=None):
@@ -121,8 +130,6 @@ class CenterDisplay(QWidget):
 
         self.time = TimeWidget(self)
         self.time.move(self.x, self.y + 30)
-
-
     def paintEvent(self, event):
         painter = QPainter(self)
         self.central_widget_lines(painter)        
@@ -218,6 +225,8 @@ class CenterDisplay(QWidget):
         painter.setPen(QPen(shadow_color, line_thickness))
         painter.drawLine(line_b_x_position, line_b_y_position + 2, line_b_x_position + line_b_length, line_b_y_position + 2)
 
+
+
 class ControlTest(QWidget):
     def __init__(self, rpm_widget_instance, speed_widget_instance, fuel_widget_instance, coolant_widget_instance, main_display_instance, parent=None):
         super().__init__(parent)
@@ -291,6 +300,9 @@ class ControlTest(QWidget):
         self.main_display.repaint()
         """Override the resizeEvent to redraw the grid when the widget is resized."""
         self.update()
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainWin = instrumentcluster()
@@ -298,3 +310,4 @@ if __name__ == "__main__":
     mainWin.control_test.show()
 
     sys.exit(app.exec_())
+ 
