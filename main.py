@@ -6,7 +6,7 @@ import sys
 
 ## Module Imports
 from designs.singledial.singledial import Display
-from designs.dualdial.application import DualDisplay
+from designs.multi_design.application import instrumentcluster
 #from components.arduino.arduino_serial import ArduinoSerial
 
 ## Import Value Update Fields
@@ -73,7 +73,8 @@ class MainWindow(QMainWindow):
         label = QLabel()
         self.setCentralWidget(label)
         layout = QGridLayout(label)
-        self.display = Display()
+        # self.display = Display()
+        self.display = instrumentcluster()
         self.display.setAttribute(Qt.WA_TranslucentBackground, True)              
         layout.addWidget(self.display, 1, 0, 1, 2)  
         palette = QPalette()
