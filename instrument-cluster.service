@@ -7,3 +7,4 @@ PodmanArgs=--interactive --privileged --tty
 Volume=/tmp/.X11-unix:/tmp/.X11-unix
 Volume=/usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:ro
 Volume=/dev/dri:/dev/dri
+Volume=${INSTRUMENTCLUSTER}:/var/app/InstrumentCluster
