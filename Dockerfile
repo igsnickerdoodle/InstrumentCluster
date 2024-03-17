@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     libqt5core5a \
     libqt5gui5 \
     libqt5widgets5 \
+    unclutter \
     qt5-qmake \
     python3-pyqt5 \
     pyqt5-dev-tools \
@@ -46,6 +47,7 @@ RUN echo "#!/bin/bash\n\
 xset s off\n\
 xset -dpms\n\
 xset s noblank\n\
+unclutter -idle 0.1 -root\n\
 exec python3 /usr/src/app/main.py" > /usr/src/app/start.sh && chmod +x /usr/src/app/start.sh
 
 RUN mkdir -p /tmp/runtime-root && \
