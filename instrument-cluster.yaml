@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  instrumentcluster:
+    image: localhost/instrumentcluster.v1
+    environment:
+      - DISPLAY=:0
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:ro
+      - /dev/dri:/dev/dri
+    cap_add:
+      - SYS_ADMIN
+    privileged: true

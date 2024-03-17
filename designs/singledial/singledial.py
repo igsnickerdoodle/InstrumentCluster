@@ -10,13 +10,13 @@ root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 from designs.singledial import global_x, global_y
 
-from components.rpm.rpm_single_display import rpm_display
-from components.speed.text import speed_display
-from components.afr.app_design_1 import afr_display
-from components.boost.boost_1 import boost_display
-from components.fuel.fuel_1 import fuel_display
-from components.oil.oil_temp_1 import oil_display
-from components.coolant_temp.coolant_singledisplay import coolant_display
+from components.rpm.sd_rpm_1 import rpm_display
+from components.speed.sd_speed_1 import speed_display
+from components.afr.sd_afr_1 import afr_display
+from components.boost.sd_boost_1 import boost_display
+from components.fuel.sd_fuel_1 import fuel_display
+from components.oil.sd_oil_1 import oil_display
+from components.coolant_temp.sd_coolant_1 import coolant_display
 
 
 class Background(QWidget):
