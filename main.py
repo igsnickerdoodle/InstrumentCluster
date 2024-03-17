@@ -1,7 +1,8 @@
 # Needed imports for functioning instrument cluster
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout
 from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
+from PyQt5 import QtCore
 import sys
 
 ## Module Imports
@@ -82,6 +83,7 @@ class MainWindow(QMainWindow):
         self.setPalette(palette)
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setOverrideCursor(QtCore.Qt.BlankCursor)
     mainWin = MainWindow()
     mainWin.show()
     sys.exit(app.exec_())

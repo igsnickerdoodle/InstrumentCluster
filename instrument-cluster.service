@@ -1,0 +1,9 @@
+# instrumentcluster.v1.container
+[Container]
+AddCapability=SYS_ADMIN
+Environment=DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/runtime-root
+Image=localhost/instrumentcluster.v1
+PodmanArgs=--interactive --privileged --tty
+Volume=/tmp/.X11-unix:/tmp/.X11-unix
+Volume=/usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:ro
+Volume=/dev/dri:/dev/dri
