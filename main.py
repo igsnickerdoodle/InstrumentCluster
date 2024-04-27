@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 import sys
 
 ## Module Imports
-from designs.singledial.singledial import Display
+from InstrumentCluster.designs.design_1.app import Display
 from designs.multi_design.application import instrumentcluster
 #from components.arduino.arduino_serial import ArduinoSerial
 
@@ -21,6 +21,8 @@ from components.coolant_temp.sd_coolant_1 import coolant_display
 from components.speed.gpsfile import gps
 from components.speed.sd_speed_1  import speed_display
 
+## Disabled for Development Purposing
+
 # class ValueUpdate:
 #     def __init__(self):
 #         super().__init__()
@@ -28,7 +30,7 @@ from components.speed.sd_speed_1  import speed_display
 #         self.gps = gps()
 #         self.arduino = ArduinoSerial()   
 #         ## Initial component updates
-#         self.speed_value = Speed.update_speed
+#         self.speed_value = Speed.update_speed  
 #         self.afr_value = AFR.update_afr
 #         self.coolant_value = CoolantGauge.update_coolant
 #         self.boost_value = BoostMeter.update_boost
@@ -75,7 +77,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(label)
         layout = QGridLayout(label)
         # self.display = Display()
-        self.display = instrumentcluster()
+        self.display = Display()
         self.display.setAttribute(Qt.WA_TranslucentBackground, True)              
         layout.addWidget(self.display, 1, 0, 1, 2)  
         palette = QPalette()

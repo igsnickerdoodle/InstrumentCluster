@@ -1,15 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QVBoxLayout, QSlider
 from PyQt5.QtCore import Qt, QPoint, QPointF
 from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QPixmap, QRadialGradient, QBrush
 from pathlib import Path
 import math, sys
+import os
 
 ### Local component imports
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
-from designs.singledial import global_x, global_y
-
+from designs.design_1 import global_x, global_y
 from components.rpm.sd_rpm_1 import rpm_display
 from components.speed.sd_speed_1 import speed_display
 from components.afr.sd_afr_1 import afr_display
@@ -17,7 +17,7 @@ from components.boost.sd_boost_1 import boost_display
 from components.fuel.sd_fuel_1 import fuel_display
 from components.oil.sd_oil_1 import oil_display
 from components.coolant_temp.sd_coolant_1 import coolant_display
-
+from simulators.controllertest import ControlTest
 
 class Background(QWidget):
     def __init__(self, parent=None):
@@ -25,45 +25,8 @@ class Background(QWidget):
         ## Initialize Modules
         self.global_x = global_x
         self.global_y = global_y
-        # Setup the swap displays
-        # self.current_display = self.boost_display 
-        self.create_toggle_buttons()  # Ensure this method is defined
-        self.indicator_light_cel = QLabel(self)
-        self.indicator_light_highbeams = QLabel(self)
-        self.indicator_light_foglights = QLabel(self)
-
-        # Initial / Default 'off' state
-        self.cel_on = False
-        self.highbeams_on = False
-        self.foglights_on = False
         self.max_rpm_value = 8000
         
-    def create_toggle_buttons(self):
-
-        # self.toggle_button_center_top = QPushButton("Toggle Center-Top", self)
-        # self.toggle_button_center_top.clicked.connect(self.swap_display)
-        # self.toggle_button_center_top.setGeometry(10, 170, 120, 40)  # Adjust the size and position as needed
-        # self.toggle_button_center_top.setStyleSheet("background-color: red")
-        # self.toggle_button_center_top.show()
-
-        self.toggle_button_cel = QPushButton("Toggle CEL", self)
-        self.toggle_button_cel.clicked.connect(self.swap_display_cel)
-        self.toggle_button_cel.setGeometry(10, 10, 120, 40)
-        self.toggle_button_cel.setStyleSheet("background-color: red")
-        self.toggle_button_cel.show()
-
-        self.toggle_button_highbeams = QPushButton("Toggle High Beams", self)
-        self.toggle_button_highbeams.clicked.connect(self.swap_display_highbeams)
-        self.toggle_button_highbeams.setGeometry(10, 60, 120, 40)
-        self.toggle_button_highbeams.setStyleSheet("background-color: red")
-        self.toggle_button_highbeams.show()
-
-        self.toggle_button_foglights = QPushButton("Toggle Fog Lights", self)
-        self.toggle_button_foglights.clicked.connect(self.swap_display_foglights)
-        self.toggle_button_foglights.setGeometry(10, 110, 120, 40)
-        self.toggle_button_foglights.setStyleSheet("background-color: red")
-        self.toggle_button_foglights.show()     
-
     def top_center_bg(self, painter):
         boostbg_x = 35
         boostbg_y = 85
@@ -75,14 +38,6 @@ class Background(QWidget):
         painter.setPen(QPen(QColor(46, 46, 46), 20, Qt.SolidLine))
         painter.drawArc(boostbg_x + self.global_x, boostbg_y + self.global_y, boostbg_size, boostbg_size, 136 * 16, -91 * 16) 
 
-    # def swap_display(self):
-    #     #print("Button clicked!")  # If this doesn't print, the button is not connected properly
-    #     if self.current_display == self.BoostGauge:
-    #         self.current_display = self.OilTemp
-    #     else:
-    #         self.current_display = self.BoostGauge
-    #     self.update()
-
     def drawGradient(self, painter):
         arc_x = self.global_x - 30
         arc_y = 30 + self.global_y
@@ -91,7 +46,7 @@ class Background(QWidget):
         start_angle = 332 * 16
         span_angle = 238 * 16
 
-        # Create a radial gradient
+        # Radial Arc
         gradient = QRadialGradient(QPointF(arc_x + arc_width / 2, arc_y + arc_height / 2), arc_width / 2)
 
         # Add color stops
@@ -215,43 +170,77 @@ class Background(QWidget):
         painter.setPen(QPen(QColor(255, 255, 255), 3, Qt.SolidLine))
         painter.drawArc(self.global_x - 50, self.global_y, 600, 600, 315 * 16, 271 * 16)
 
-## indicators light section
-    def swap_display_cel(self):
-        self.indicator_light_cel.setGeometry(238 + self.config.global_x, 500 + self.config.global_y, 30, 30) 
+class IndicatorLights(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        ## Initialize Modules
+        self.global_x = global_x
+        self.global_y = global_y   
+
+        self.indicator_light_cel = QLabel(self)
+        self.indicator_light_highbeams = QLabel(self)
+        self.indicator_light_foglights = QLabel(self)
+
+        # Initial / Default 'off' state
+        self.cel_on = False
+        self.highbeams_on = False
+        self.foglights_on = False
+
+    def cel(self):
+        self.indicator_light_cel.setGeometry(238 + self.global_x, 500 + self.global_y, 30, 30) 
         if self.cel_on:
             self.indicator_light_cel.clear()
             self.cel_on = False
         else:
-            pixmap = QPixmap('resources/cel.png')
-            pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.indicator_light_cel.setPixmap(pixmap)
+            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/cel.png')
+            if pixmap.isNull():
+                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/cel.png")
+            else:
+                pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.indicator_light_cel.setPixmap(pixmap)
             self.cel_on = True
         self.indicator_light_cel.show()
-    def swap_display_highbeams(self):
-        self.indicator_light_highbeams.setGeometry(320 + self.config.global_x, 500 + self.config.global_y, 30, 30)
+
+    def highbeams(self):
+        self.indicator_light_highbeams.setGeometry(320 + self.global_x, 500 + self.global_y, 30, 30)
         if self.highbeams_on:
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
         else:
-            pixmap = QPixmap('resources/High_Beam.png')
-            pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.indicator_light_highbeams.setPixmap(pixmap)
+            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/highbeam.png')
+            if pixmap.isNull():
+                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/highbeam.png")
+            else:
+                pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.indicator_light_highbeams.setPixmap(pixmap)
             self.highbeams_on = True
         self.indicator_light_highbeams.show()
-    def swap_display_foglights(self):
-        self.indicator_light_foglights.setGeometry(140 + self.config.global_x, 500 + self.config.global_y, 30, 30)
+
+    def foglights(self):
+        self.indicator_light_foglights.setGeometry(140 + self.global_x, 500 + self.global_y, 30, 30)
         if self.foglights_on:
             self.indicator_light_foglights.clear()
             self.foglights_on = False
         else:
-            pixmap = QPixmap('resources/Fog_light.png')
-            pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.indicator_light_foglights.setPixmap(pixmap)
+            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/foglights.png')
+            if pixmap.isNull():
+                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/foglights.png")
+            else:
+                pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.indicator_light_foglights.setPixmap(pixmap)
             self.foglights_on = True
         self.indicator_light_foglights.show()
 
 
-class Display(QWidget):
+    def updateIndicators(self, painter):
+        if self.cel_on:
+            self.cel()
+        if self.highbeams_on:
+            self.highbeams()
+        if self.foglights_on:
+            self.foglights() 
+
+class instrumentcluster(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         
@@ -264,10 +253,14 @@ class Display(QWidget):
         self.boost_display = boost_display(self)
         self.fuel_display = fuel_display(self)
         
+        self.indicator_lights = IndicatorLights(self)
+
         # Setup the swap displays
-        self.current_display = self.boost_display.widget
+        # self.current_display = self.boost_display.widget
+        # self.boost_value = self.boost_display.boost_value
         
-        boost_value = self.boost_display.boost_value
+        self.setGeometry(0, 0, 1024, 600)
+        self.setStyleSheet("background-color: black;") 
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -287,25 +280,30 @@ class Display(QWidget):
         self.coolant_display.widget(painter)
         self.fuel_display.widget(painter)  
               
-        # self.boost_display.widget(painter)
-        # self.oil_display.widget(painter)
+        self.boost_display.widget(painter)
+        self.oil_display.widget(painter)
         
+        self.indicator_lights.updateIndicators(painter)
+
         # Display swaps
-        self.current_display(painter)
+        # self.current_display(painter)
     
-    def swap_display(self):
-        #print("Button clicked!")  # If this doesn't print, the button is not connected properly
-        if self.current_display == self.boost_display:
-            self.current_display = self.oil_display
-        else:
-            self.current_display = self.boost_display
-        self.update()
+    # def swap_display(self):
+    #     #print("Button clicked!")  # If this doesn't print, the button is not connected properly
+    #     if self.current_display == self.boost_display:
+    #         self.current_display = self.oil_display
+    #     else:
+    #         self.current_display = self.boost_display
+    #     self.update()
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    mainWin = Display()
+    mainWin = instrumentcluster()
     mainWin.show()
+
+    secondaryWin = ControlTest(mainWin.indicator_lights)
+    secondaryWin.show()
 
     sys.exit(app.exec_())
 

@@ -10,7 +10,7 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-from components.speed.dd_speed_2 import background_speed, speed_widget
+from InstrumentCluster.components.speed.dd2 import background_speed, speed_widget
 from components.rpm.dd_rpm_2 import background_rpm, rpm_widget
 from components.fuel.dd_fuel_1 import background_fuel, fuel_widget
 from components.coolant_temp.dd_coolant_1 import background_coolant, coolant_temp
@@ -65,8 +65,6 @@ class instrumentcluster(QWidget):
             painter.drawLine(0, y, width, y)
         painter.end()   
 
-
-
 class RightDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -92,8 +90,6 @@ class RightDisplay(QWidget):
         self.coolant_widget.bar_widget(painter)
         self.background_coolant.coolant_indicators(painter)
 
-
-
 class LeftDisplay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -102,6 +98,7 @@ class LeftDisplay(QWidget):
         self.rpm_widget = rpm_widget()
         self.background_fuel = background_fuel()
         self.fuel_widget = fuel_widget()
+        
     def paintEvent(self, event):
         painter = QPainter(self)
         
@@ -115,8 +112,6 @@ class LeftDisplay(QWidget):
 
         self.background_fuel.fuel_indicators(painter)
         self.fuel_widget.bar_widget(painter)       
-
-
 
 class CenterDisplay(QWidget):
     def __init__(self, parent=None):
@@ -224,8 +219,6 @@ class CenterDisplay(QWidget):
         painter.drawLine(line_b_x_position, line_b_y_position, line_b_x_position + line_b_length, line_b_y_position)
         painter.setPen(QPen(shadow_color, line_thickness))
         painter.drawLine(line_b_x_position, line_b_y_position + 2, line_b_x_position + line_b_length, line_b_y_position + 2)
-
-
 
 class ControlTest(QWidget):
     def __init__(self, rpm_widget_instance, speed_widget_instance, fuel_widget_instance, coolant_widget_instance, main_display_instance, parent=None):
