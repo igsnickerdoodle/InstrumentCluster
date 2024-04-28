@@ -17,7 +17,6 @@ from components.boost.sd_boost_1 import boost_display
 from components.fuel.sd_fuel_1 import fuel_display
 from components.oil.sd_oil_1 import oil_display
 from components.coolant_temp.sd_coolant_1 import coolant_display
-from simulators.controllertest import ControlTest
 
 class Background(QWidget):
     def __init__(self, parent=None):
@@ -25,7 +24,6 @@ class Background(QWidget):
         ## Initialize Modules
         self.global_x = global_x
         self.global_y = global_y
-        self.max_rpm_value = 8000
         
     def top_center_bg(self, painter):
         boostbg_x = 35
@@ -84,92 +82,6 @@ class Background(QWidget):
 
         painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                 
 
-    def drawIndicators(self, painter):
-        start_angle = -5  
-        end_angle = 269  
-        center_angle = (start_angle + end_angle) / 2
-
-        number_offset = 20  
-        indicator_length = 8  
-        indicator_radius_1 = 290  
-        indicator_radius_2 = 293  
-        indicator_radius_3 = 294 
-        pivot_x = 250 + self.global_x
-        pivot_y = 300 + self.global_y
-        angle_range = abs(end_angle - start_angle)
-
-
-        def get_color(rpm_indicator):
-            # Determine the color based on RPM range
-            if 4500 <= rpm_indicator <= 5500:
-                return QColor(129, 196, 255)  # Light sky blue
-            elif 5500 <= rpm_indicator <= 6500:
-                return QColor(22, 88, 142)  # Yale Blue
-            elif 6500 <= rpm_indicator <= 8000:
-                return QColor(231, 34, 46)  # Alizarin Crimson
-            else:
-                return QColor(255, 255, 255)  # Default color (white)
-            
-        for rpm_indicator in range(0, 9001, 1000):
-                if rpm_indicator <= self.max_rpm_value:
-                    indicator_length = 8
-                    indicator_angle = center_angle + (rpm_indicator / self.max_rpm_value) * angle_range
-                    start_x = int(pivot_x + indicator_radius_1 * math.cos(math.radians(indicator_angle)))
-                    start_y = int(pivot_y + indicator_radius_1 * math.sin(math.radians(indicator_angle)))
-                    end_x = int(start_x + indicator_length * math.cos(math.radians(indicator_angle)))
-                    end_y = int(start_y + indicator_length * math.sin(math.radians(indicator_angle)))
-
-                    indicator_pen = QPen(get_color(rpm_indicator), 5, Qt.SolidLine)
-                    painter.setPen(indicator_pen)
-                    painter.drawLine(start_x, start_y, end_x, end_y)
-                    
-                    # Add RPM values as numbers
-                    rpm_value = rpm_indicator // 1000
-                    rpm_value_x = int(pivot_x + (indicator_radius_1 - 0 - number_offset) * math.cos(math.radians(indicator_angle)))
-                    rpm_value_y = int(pivot_y + (indicator_radius_1 - 0 - number_offset) * math.sin(math.radians(indicator_angle)))
-                    rpm_value_font = QFont("Nimbus Sans", 14)
-                    painter.setFont(rpm_value_font)
-                    painter.setPen(QColor(255, 255, 255))
-                    fontMetrics = painter.fontMetrics()
-                    textWidth = fontMetrics.horizontalAdvance(str(rpm_value))
-                    textHeight = fontMetrics.height()
-                    # Adjust the x and y position considering the text dimensions
-                    adjusted_x = int(rpm_value_x - textWidth / 2)
-                    adjusted_y = int(rpm_value_y + textHeight / 2)
-                    painter.drawText(adjusted_x, adjusted_y, str(rpm_value))
-
-        # Repeat the same logic for the next two loops
-        for rpm_indicator in range(0, 9001, 500):
-            if rpm_indicator <= self.max_rpm_value and rpm_indicator % 1000 != 0:
-                indicator_length = 4
-                indicator_angle = center_angle + (rpm_indicator / 8000) * angle_range
-                start_x = int(pivot_x + indicator_radius_2 * math.cos(math.radians(indicator_angle)))
-                start_y = int(pivot_y + indicator_radius_2 * math.sin(math.radians(indicator_angle)))
-                end_x = int(start_x + indicator_length * math.cos(math.radians(indicator_angle)))
-                end_y = int(start_y + indicator_length * math.sin(math.radians(indicator_angle)))
-
-                indicator_pen = QPen(get_color(rpm_indicator), 3, Qt.SolidLine)
-                painter.setPen(indicator_pen)
-                painter.drawLine(start_x, start_y, end_x, end_y)
-
-        for rpm_indicator in range(0, 9001, 100):
-            if rpm_indicator <= self.max_rpm_value:
-                if rpm_indicator % 500 != 0 and rpm_indicator % 1000 != 0:
-                    indicator_length = 2
-                    indicator_angle = center_angle + (rpm_indicator / 8000) * angle_range
-                    start_x = int(pivot_x + indicator_radius_3 * math.cos(math.radians(indicator_angle)))
-                    start_y = int(pivot_y + indicator_radius_3 * math.sin(math.radians(indicator_angle)))
-                    end_x = int(start_x + indicator_length * math.cos(math.radians(indicator_angle)))
-                    end_y = int(start_y + indicator_length * math.sin(math.radians(indicator_angle)))
-
-                    indicator_pen = QPen(get_color(rpm_indicator), 2, Qt.SolidLine)
-                    painter.setPen(indicator_pen)
-                    painter.drawLine(start_x, start_y, end_x, end_y)
-
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(QPen(QColor(255, 255, 255), 3, Qt.SolidLine))
-        painter.drawArc(self.global_x - 50, self.global_y, 600, 600, 315 * 16, 271 * 16)
-
 class IndicatorLights(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -192,9 +104,9 @@ class IndicatorLights(QWidget):
             self.indicator_light_cel.clear()
             self.cel_on = False
         else:
-            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/cel.png')
+            pixmap = QPixmap('resources/cel.png')
             if pixmap.isNull():
-                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/cel.png")
+                print("resources/cel.png")
             else:
                 pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 self.indicator_light_cel.setPixmap(pixmap)
@@ -207,9 +119,9 @@ class IndicatorLights(QWidget):
             self.indicator_light_highbeams.clear()
             self.highbeams_on = False
         else:
-            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/highbeam.png')
+            pixmap = QPixmap('resources/highbeam.png')
             if pixmap.isNull():
-                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/highbeam.png")
+                print("Failed to load image from resources/highbeam.png")
             else:
                 pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 self.indicator_light_highbeams.setPixmap(pixmap)
@@ -222,9 +134,9 @@ class IndicatorLights(QWidget):
             self.indicator_light_foglights.clear()
             self.foglights_on = False
         else:
-            pixmap = QPixmap('S:/Github/InstrumentCluster/InstrumentCluster/resources/foglights.png')
+            pixmap = QPixmap('resources/foglights.png')
             if pixmap.isNull():
-                print("Failed to load image from S:/Github/InstrumentCluster/InstrumentCluster/resources/foglights.png")
+                print("resources/foglights.png")
             else:
                 pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 self.indicator_light_foglights.setPixmap(pixmap)
@@ -246,19 +158,15 @@ class instrumentcluster(QWidget):
         
         self.rpm_meter_display = rpm_display(self)
         self.speed_display = speed_display(self)
-        self.background = Background(self)
         self.oil_display = oil_display(self)
         self.afr_display = afr_display(self)
         self.coolant_display = coolant_display(self)
         self.boost_display = boost_display(self)
         self.fuel_display = fuel_display(self)
-        
         self.indicator_lights = IndicatorLights(self)
 
-        # Setup the swap displays
-        # self.current_display = self.boost_display.widget
-        # self.boost_value = self.boost_display.boost_value
-        
+
+        self.background = Background(self)
         self.setGeometry(0, 0, 1024, 600)
         self.setStyleSheet("background-color: black;") 
 
@@ -269,9 +177,9 @@ class instrumentcluster(QWidget):
         # Draw elements from Background
         self.background.drawGradient(painter)
         self.background.drawSideArcs(painter)
-        self.background.drawIndicators(painter)
         self.background.drawCenterCircle(painter)
         self.background.top_center_bg(painter)
+        self.rpm_meter_display.drawIndicators(painter)
 
         # Draw components
         self.rpm_meter_display.widget(painter)
@@ -284,17 +192,6 @@ class instrumentcluster(QWidget):
         self.oil_display.widget(painter)
         
         self.indicator_lights.updateIndicators(painter)
-
-        # Display swaps
-        # self.current_display(painter)
-    
-    # def swap_display(self):
-    #     #print("Button clicked!")  # If this doesn't print, the button is not connected properly
-    #     if self.current_display == self.boost_display:
-    #         self.current_display = self.oil_display
-    #     else:
-    #         self.current_display = self.boost_display
-    #     self.update()
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -302,8 +199,5 @@ if __name__ == "__main__":
     mainWin = instrumentcluster()
     mainWin.show()
 
-    secondaryWin = ControlTest(mainWin.indicator_lights)
-    secondaryWin.show()
-
     sys.exit(app.exec_())
-
+ 

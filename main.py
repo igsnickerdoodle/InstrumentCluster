@@ -6,8 +6,9 @@ from PyQt5 import QtCore
 import sys
 
 ## Module Imports
-from InstrumentCluster.designs.design_1.app import Display
-from designs.multi_design.application import instrumentcluster
+from designs.design_1 import app
+from designs.design_2 import app
+from components.settingsmenu import settings
 #from components.arduino.arduino_serial import ArduinoSerial
 
 ## Import Value Update Fields
@@ -77,12 +78,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(label)
         layout = QGridLayout(label)
         # self.display = Display()
-        self.display = Display()
+        self.display = app()
         self.display.setAttribute(Qt.WA_TranslucentBackground, True)              
         layout.addWidget(self.display, 1, 0, 1, 2)  
         palette = QPalette()
         palette.setColor(QPalette.Background, QColor('black'))
         self.setPalette(palette)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setOverrideCursor(QtCore.Qt.BlankCursor)
