@@ -1,22 +1,26 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QLabel, QVBoxLayout, QSlider
+from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, QPoint, QPointF
-from PyQt5.QtGui import QPainter, QPen, QColor, QFont, QPixmap, QRadialGradient, QBrush
+from PyQt5.QtGui import QPainter, QPen, QColor, QRadialGradient, QBrush
 from pathlib import Path
-import math, sys
-import os
+import sys
 
 ### Local component imports
 current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
+
+
 from designs.design_1 import global_x, global_y
 from components.rpm.sd_rpm_1 import rpm_display
-from components.speed.sd_speed_1 import speed_display
+from components.speed.sd_speed_1 import speed_display 
 from components.afr.sd_afr_1 import afr_display
 from components.boost.sd_boost_1 import boost_display
 from components.fuel.sd_fuel_1 import fuel_display
 from components.oil.sd_oil_1 import oil_display
 from components.coolant_temp.sd_coolant_1 import coolant_display
+from components.indicators.app import IndicatorLights
+from components.loading_screen.splashscreen import LoadingScreen
+
 
 class Background(QWidget):
     def __init__(self, parent=None):
@@ -82,80 +86,11 @@ class Background(QWidget):
 
         painter.drawEllipse(QPoint(center_x, center_y), radius, radius)                 
 
-class IndicatorLights(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        ## Initialize Modules
-        self.global_x = global_x
-        self.global_y = global_y   
-
-        self.indicator_light_cel = QLabel(self)
-        self.indicator_light_highbeams = QLabel(self)
-        self.indicator_light_foglights = QLabel(self)
-
-        # Initial / Default 'off' state
-        self.cel_on = False
-        self.highbeams_on = False
-        self.foglights_on = False
-
-    def cel(self):
-        self.indicator_light_cel.setGeometry(238 + self.global_x, 500 + self.global_y, 30, 30) 
-        if self.cel_on:
-            self.indicator_light_cel.clear()
-            self.cel_on = False
-        else:
-            pixmap = QPixmap('resources/cel.png')
-            if pixmap.isNull():
-                print("resources/cel.png")
-            else:
-                pixmap = pixmap.scaled(self.indicator_light_cel.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                self.indicator_light_cel.setPixmap(pixmap)
-            self.cel_on = True
-        self.indicator_light_cel.show()
-
-    def highbeams(self):
-        self.indicator_light_highbeams.setGeometry(320 + self.global_x, 500 + self.global_y, 30, 30)
-        if self.highbeams_on:
-            self.indicator_light_highbeams.clear()
-            self.highbeams_on = False
-        else:
-            pixmap = QPixmap('resources/highbeam.png')
-            if pixmap.isNull():
-                print("Failed to load image from resources/highbeam.png")
-            else:
-                pixmap = pixmap.scaled(self.indicator_light_highbeams.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                self.indicator_light_highbeams.setPixmap(pixmap)
-            self.highbeams_on = True
-        self.indicator_light_highbeams.show()
-
-    def foglights(self):
-        self.indicator_light_foglights.setGeometry(140 + self.global_x, 500 + self.global_y, 30, 30)
-        if self.foglights_on:
-            self.indicator_light_foglights.clear()
-            self.foglights_on = False
-        else:
-            pixmap = QPixmap('resources/foglights.png')
-            if pixmap.isNull():
-                print("resources/foglights.png")
-            else:
-                pixmap = pixmap.scaled(self.indicator_light_foglights.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                self.indicator_light_foglights.setPixmap(pixmap)
-            self.foglights_on = True
-        self.indicator_light_foglights.show()
-
-
-    def updateIndicators(self, painter):
-        if self.cel_on:
-            self.cel()
-        if self.highbeams_on:
-            self.highbeams()
-        if self.foglights_on:
-            self.foglights() 
-
 class instrumentcluster(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         
+        self.background = Background(self)
         self.rpm_meter_display = rpm_display(self)
         self.speed_display = speed_display(self)
         self.oil_display = oil_display(self)
@@ -163,10 +98,16 @@ class instrumentcluster(QWidget):
         self.coolant_display = coolant_display(self)
         self.boost_display = boost_display(self)
         self.fuel_display = fuel_display(self)
+
         self.indicator_lights = IndicatorLights(self)
+        self.indicator_lights.setGeometry(0, 0, 1024, 600)
+        self.indicator_lights.show()
 
+        # self.loading_screen = LoadingScreen(self)
+        # self.loading_screen.setGeometry(0,0,1024,600)
+        # self.loading_screen.show()
 
-        self.background = Background(self)
+        # self.background = Background(self)
         self.setGeometry(0, 0, 1024, 600)
         self.setStyleSheet("background-color: black;") 
 
@@ -179,6 +120,8 @@ class instrumentcluster(QWidget):
         self.background.drawSideArcs(painter)
         self.background.drawCenterCircle(painter)
         self.background.top_center_bg(painter)
+
+        # Dynamic RPM Redline
         self.rpm_meter_display.drawIndicators(painter)
 
         # Draw components
@@ -191,7 +134,6 @@ class instrumentcluster(QWidget):
         self.boost_display.widget(painter)
         self.oil_display.widget(painter)
         
-        self.indicator_lights.updateIndicators(painter)
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)

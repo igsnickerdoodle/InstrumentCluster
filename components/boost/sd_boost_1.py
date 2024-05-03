@@ -27,7 +27,7 @@ class boost_display(QWidget):
         bar_color = self.boost_color
         # Parameters for Arc
         pivot_x = 250 + self.global_x
-        pivot_y = 253 + self.global_y
+        pivot_y = 280 + self.global_y
 
         # Parameter for Max Values
         pivot_text_max_y = 220

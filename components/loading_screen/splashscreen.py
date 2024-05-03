@@ -1,81 +1,45 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGraphicsOpacityEffect
+from PyQt5.QtCore import Qt, QPropertyAnimation
+from PyQt5.QtGui import QPixmap
 
-from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtSignal
-from PyQt5.QtWidgets import QSplashScreen, QProgressBar, QVBoxLayout, QLabel, QWidget, QGraphicsOpacityEffect
-from PyQt5.QtGui import QPixmap, QPainter
-
-class SplashScreen(QSplashScreen):
-    finished = pyqtSignal()
-    
-    def __init__(self):
-        super().__init__()
-
-        # Set splash screen size
-        self.setGeometry(0, 0, 680, 420)
-
-        # Load image and set as background
-        self.pixmap = QPixmap('resources/bmw_splash.jpg').scaled(self.size(), Qt.KeepAspectRatioByExpanding)
-        self.setPixmap(self.pixmap)
-
-        # Create a progress bar
-        self.progress = QProgressBar()
-        self.progress.setStyleSheet("""
-            QProgressBar {
-                border: none;
-                text-align: center;
-                color: white;
-                font: 15pt "Impact";
-                background: transparent;
-            }
-            QProgressBar::chunk {
-                background-color: #81C4FFFF;
-            }
+class LoadingScreen(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.initUI()
+        self.setGeometry(600, 600, 700, 600)
+        self.setStyleSheet("""
+        QWidget {
+            background-color: transparent;
+        }
+        QLabel {
+            background-color: transparent;
+        }
         """)
 
-        # Create a label
-        self.label = QLabel("Initializing systems... Please wait...")
-        self.label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font: 15pt "Impact";
-            }
-        """)
+    def initUI(self):
+        # Create a label to hold the image
+        self.label = QLabel(self)
+        self.label.setAlignment(Qt.AlignCenter)
+        # self.label.setGeometry(50, 50, 200, 100)  # Adjust size and position as needed
 
-        # Create an opacity effect for the label
+        # Load an image into the label
+        self.label.setPixmap(QPixmap(r"C:\Users\justc\github\InstrumentCluster\resources\mazda.png").scaled(405, 291, Qt.KeepAspectRatio))
+
+        # Set up opacity effect
         self.opacity_effect = QGraphicsOpacityEffect(self.label)
         self.label.setGraphicsEffect(self.opacity_effect)
 
-        # Create an animation to change the opacity
-        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
-        self.animation.setStartValue(1.0)
-        self.animation.setEndValue(0.0)
-        self.animation.setDuration(1000)
-        self.animation.setLoopCount(-1)  # Loop indefinitely
-        self.animation.start()
+        # Set up the fade animation on the opacity effect
+        self.anim = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.anim.setDuration(3000)  # Duration in milliseconds (5000 ms = 5 seconds)
+        self.anim.setStartValue(0)  # Start fully transparent
+        self.anim.setEndValue(1)  # End fully opaque
+        self.anim.start()
 
-        # Create a vertical layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.label, alignment=Qt.AlignHCenter)
-        layout.addWidget(self.progress, alignment=Qt.AlignHCenter)
-
-        # Create a widget to hold the label and progress bar
-        widget = QWidget()
-        widget.setLayout(layout)
-
-        # Create a main layout and add the widget to it
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(widget, alignment=Qt.AlignBottom | Qt.AlignHCenter)
-
-        # Set the layout to the splash screen
-        self.setLayout(main_layout)
-
-    def set_progress(self, progress):
-        self.progress.setValue(progress)
-        if progress >= 100:
-            self.finish()
-        
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.drawPixmap(0, 0, self.pixmap)
-    
-    def finish(self):
-        self.finished.emit()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    demo = LoadingScreen()
+    demo.setStyleSheet("background-color: black;")
+    demo.show()
+    sys.exit(app.exec_())
