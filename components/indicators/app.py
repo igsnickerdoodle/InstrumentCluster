@@ -17,11 +17,8 @@ class IndicatorLights(QWidget):
         ## Initialize Modules
         self.global_x = global_x
         self.global_y = global_y
-
-        self.arduino = ArduinoReader()
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_from_arduino)
-        self.timer.start(100)   
+        
+        self.arduino_updater = ArduinoUpdater(self) 
 
         self.indicator_light_cel = QLabel(self)
         self.indicator_light_highbeams = QLabel(self)
@@ -133,31 +130,39 @@ class IndicatorLights(QWidget):
         if self.Lturn_on:
             self.Lturn()
 
+class ArduinoUpdater:
+    def __init__(self, indicator_lights):
+        self.indicator_lights = indicator_lights
+        self.arduino = ArduinoReader()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_from_arduino)
+        self.timer.start(100)
+
     def update_from_arduino(self):
         line = self.arduino.read_line()
         if line:
             print(line)  # For debugging
             if line == "cel_1":
-                self.cel(True) 
+                self.indicator_lights.cel(True)
             elif line == "cel_0":
-                self.cel(False) 
+                self.indicator_lights.cel(False)
             if line == "hb_1":
-                self.highbeams(True) 
+                self.indicator_lights.highbeams(True)
             elif line == "hb_0":
-                self.highbeams(False) 
+                self.indicator_lights.highbeams(False)
             if line == "fgl_1":
-                self.foglights(True) 
+                self.indicator_lights.foglights(True)
             elif line == "fgl_0":
-                self.foglights(False)
+                self.indicator_lights.foglights(False)
             if line == "rturn_1":
-                self.Rturn(True) 
+                self.indicator_lights.Rturn(True)
             elif line == "rturn_0":
-                self.Rturn(False)            
+                self.indicator_lights.Rturn(False)            
             if line == "lturn_1":
-                self.Lturn(True) 
+                self.indicator_lights.Lturn(True)
             elif line == "lturn_0":
-                self.Lturn(False) 
-
+                self.indicator_lights.Lturn(False)
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     

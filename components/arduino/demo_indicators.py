@@ -1,11 +1,15 @@
-# arduino_reader.py
-import serial
-import time
+import serial, time
 
 class ArduinoReader:
-    def __init__(self, port='COM3', baudrate=9600):
-        self.ser = serial.Serial(port, baudrate)
-        self.ser.flush()
+    _instance = None
+
+    def __new__(cls, port='COM4', baudrate=9600):
+        if cls._instance is None:
+            cls._instance = super(ArduinoReader, cls).__new__(cls)
+            # Put any initialization here.
+            cls._instance.ser = serial.Serial(port, baudrate)
+            cls._instance.ser.flush()
+        return cls._instance
 
     def read_line(self):
         if self.ser.in_waiting > 0:

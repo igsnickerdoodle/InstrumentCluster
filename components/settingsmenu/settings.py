@@ -3,7 +3,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSpinBox, QComboBox, QWidget, QCheckBox, QButtonGroup
 from PyQt5.QtCore import Qt
 
-class Settings(QDialog):
+class Settings(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Settings")
@@ -247,9 +247,6 @@ class Settings(QDialog):
     def change_color(self, index, delta):
         self.current_color_indexes[index] = (self.current_color_indexes[index] + delta) % len(self.colors)
         self.colorDisplays[index].setStyleSheet(f"background-color: {self.colors[self.current_color_indexes[index]]}")
-
-
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
