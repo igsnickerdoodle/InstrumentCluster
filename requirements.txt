@@ -2,3 +2,5 @@ pyserial
 pyqt5
 pynmea2
 twisted
+watchdog
+json

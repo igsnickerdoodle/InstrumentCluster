@@ -1,6 +1,8 @@
-import sys
-import os
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSpinBox, QComboBox, QWidget, QCheckBox, QButtonGroup
+import sys, os, json
+from PyQt5.QtWidgets import ( 
+    QApplication, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
+    QSpinBox, QComboBox, QWidget, QCheckBox, QButtonGroup, QSlider 
+    )
 from PyQt5.QtCore import Qt
 
 class Settings(QWidget):
@@ -9,8 +11,10 @@ class Settings(QWidget):
         self.setWindowTitle("Settings")
         self.setGeometry(100, 100, 500, 500)
         self.setStyleSheet("background-color: grey")
+        self.settings_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'cluster_settings.json'))
+        self.settings = self.load_settings()
 
-        # Initialize color index for Redline Colors
+        # Color Definition Index for RPM Meter
         self.colors = [
             'rgb(255, 0, 0)',       # Red
             'rgb(0, 255, 0)',       # Green
@@ -29,8 +33,8 @@ class Settings(QWidget):
         self.current_color_indexes = [0, 0, 0]
 
         layout = QVBoxLayout()
-        layout.setSpacing(10)  # Reduced spacing between layouts
-        layout.setContentsMargins(10, 10, 10, 10)  # Reduced margins around the main layout
+        layout.setSpacing(10)  # Reduced the spacing between layouts
+        layout.setContentsMargins(10, 10, 10, 10)  # Reduced the margins around the main layout
 
         # RPM settings
         layout.addLayout(self.setup_rpm_settings())
@@ -38,9 +42,17 @@ class Settings(QWidget):
         layout.addLayout(self.setup_redline_settings())
         # Redline Color settings
         layout.addLayout(self.setup_redline_color_settings())
-        # Boost Gauge T/F
+
+        # Boost Gauge / Max Boost Settings
         layout.addLayout(self.boost_active())
-        # AFT Gauge T/F
+        self.max_boostWidget = self.set_max_boost() 
+        layout.addWidget(self.max_boostWidget)  #
+        self.max_boostWidget.setVisible(self.boostCheckBox.isChecked())  
+        def max_boost_visibility(checked):
+            self.max_boostWidget.setVisible(checked)
+        self.boostCheckBox.stateChanged.connect(max_boost_visibility) 
+
+        # Air Fuel Gauge Settings
         layout.addLayout(self.afr_active())
         # Design selection
         layout.addLayout(self.setup_design_selection())
@@ -145,6 +157,35 @@ class Settings(QWidget):
         boostLayout.addWidget(self.boostCheckBox)
         return boostLayout
 
+    def set_max_boost(self):
+        # Create a QWidget to hold the layout
+        self.max_boost_widget = QWidget(self)
+        max_boost_layout = QHBoxLayout(self.max_boost_widget)
+        self.max_boost_widget.setFixedHeight(45)  # Set a fixed height to reduce vertical space
+
+
+        self.max_boost_slider = QSlider(Qt.Horizontal, self)
+        self.max_boost_slider.setMinimum(5)
+        self.max_boost_slider.setMaximum(40)
+        self.max_boost_slider.setTickInterval(5)
+        self.max_boost_slider.setTickPosition(QSlider.TicksBelow)
+        self.max_boost_slider.setSingleStep(5) 
+        self.max_boost_slider.setValue(5)
+        # self.max_boost_slider.setFixedHeight(30)  # Reduce the height of the slider
+
+
+        self.max_boost_label = QLabel(f"Max Boost:\n{self.max_boost_slider.value()} psi", self.max_boost_widget)
+        self.max_boost_label.setAlignment(Qt.AlignCenter)
+        max_boost_layout.addWidget(self.max_boost_label)
+        
+        def boost_label(value):
+            self.max_boost_label.setText(f"Max Boost: \n{value} psi")
+        
+        self.max_boost_slider.valueChanged.connect(boost_label)
+        max_boost_layout.addWidget(self.max_boost_slider)
+        
+        return self.max_boost_widget
+
     def afr_active(self):
         afrLayout = QHBoxLayout()
         afrLayout.setSpacing(5)
@@ -184,6 +225,10 @@ class Settings(QWidget):
         try:
             designs = [f for f in os.listdir(path) if os.path.isdir(os.path.join(path, f))]
             self.designComboBox.addItems(designs)
+            if 'selected_design' in self.settings:
+                index = self.designComboBox.findText(self.settings['selected_design'])
+                if index != -1:
+                    self.designComboBox.setCurrentIndex(index)
         except Exception as e:
             print("Failed to read designs from:", path, "Error:", str(e))
 
@@ -247,6 +292,48 @@ class Settings(QWidget):
     def change_color(self, index, delta):
         self.current_color_indexes[index] = (self.current_color_indexes[index] + delta) % len(self.colors)
         self.colorDisplays[index].setStyleSheet(f"background-color: {self.colors[self.current_color_indexes[index]]}")
+
+    def save_settings(self):
+        self.settings['max_rpm'] = self.rpmSpinBox.value()
+        self.settings['redline_rpm'] = self.redlineSpinBox.value()
+        self.settings['boost_active'] = self.boostCheckBox.isChecked()
+        self.settings['max_boost'] = self.max_boost_slider.value()
+        self.settings['afr_active'] = self.afrCheckBox.isChecked()
+        self.settings['current_color_indexes'] = self.current_color_indexes
+        self.settings['redline_color_count'] = sum(1 for btn in self.checkBoxGroup.buttons() if btn.isChecked())
+        self.settings['selected_design'] = self.designComboBox.currentText() 
+        with open(self.settings_file, 'w') as file:
+            json.dump(self.settings, file, indent=4)
+        print("Settings saved!")
+
+    def load_settings(self):
+        if os.path.exists(self.settings_file):
+            try:
+                with open(self.settings_file, 'r') as file:
+                    settings = json.load(file)
+            except json.JSONDecodeError:
+                settings = self.default_settings()
+        else:
+            settings = self.default_settings()
+
+        # Load designs into the designComboBox
+        if 'designs' in settings:
+            self.designComboBox.clear()
+            self.designComboBox.addItems(settings['designs'])
+
+        return settings
+
+    def default_settings(self):
+        return {
+            'max_rpm': 8000,
+            'redline_rpm': 6400,
+            'boost_active': False,
+            'max_boost': 5,
+            'afr_active': False,
+            'current_color_indexes': [0, 0, 0],
+            'redline_color_count': 1,
+            'designs': []
+        }
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -10,7 +10,7 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-from InstrumentCluster.components.speed.dd2 import background_speed, speed_widget
+from components.speed.dd2 import background_speed, speed_widget
 from components.rpm.dd_rpm_2 import background_rpm, rpm_widget
 from components.fuel.dd_fuel_1 import background_fuel, fuel_widget
 from components.coolant_temp.dd_coolant_1 import background_coolant, coolant_temp

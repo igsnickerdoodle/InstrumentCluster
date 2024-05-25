@@ -9,8 +9,6 @@ current_directory = Path(__file__).parent
 root_directory = current_directory / '..' / '..'
 sys.path.append(str(root_directory.resolve()))
 
-
-from designs.design_1 import global_x, global_y
 from components.rpm.sd_rpm_1 import rpm_display
 from components.speed.sd_speed_1 import speed_display 
 from components.afr.sd_afr_1 import afr_display
@@ -19,16 +17,14 @@ from components.fuel.sd_fuel_1 import fuel_display
 from components.oil.sd_oil_1 import oil_display
 from components.coolant_temp.sd_coolant_1 import coolant_display
 from components.indicators.app import IndicatorLights
-from components.loading_screen.splashscreen import LoadingScreen
-from components.settingsmenu.settings import Settings
-from components.arduino.demo_indicators import ArduinoReader
 
 class Background(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         ## Initialize Modules
-        self.global_x = global_x
-        self.global_y = global_y
+        self.global_x = 280
+        self.global_y = 50
+        self.text_labels = "Nimbus Sans Bold"
         
     def top_center_bg(self, painter):
         boostbg_x = 35
@@ -107,16 +103,8 @@ class instrumentcluster(QWidget):
         self.setGeometry(0, 0, 1024, 600)
         self.setStyleSheet("background-color: black;") 
 
-        self.settings_window = Settings()  # Assume this is a QWidget or similar.
-        self.settings_window.setGeometry(0, 0, 1024, 600)
-        self.settings_window.hide()  # Initially hidden.
-
-        self.arduino_reader = ArduinoReader()
-        self.arduino_updater = ArduinoUpdater(self.indicator_lights, self)
-
     def show_settings(self):
         self.settings_window.show()  # Make settings window visible.
-
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -137,29 +125,8 @@ class instrumentcluster(QWidget):
         self.afr_display.widget(painter)
         self.coolant_display.widget(painter)
         self.fuel_display.widget(painter)  
-              
         self.boost_display.widget(painter)
         self.oil_display.widget(painter)
-
-class ArduinoUpdater:
-    def __init__(self, indicator_lights, main_window):
-        # Input Signals
-        self.indicator_lights = indicator_lights
-        self.main_window = main_window
-
-        ## Init Arduino
-        self.arduino = ArduinoReader()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_from_arduino)
-        ## Adjust Timer settings for needs
-        self.timer.start(100)
-
-    def update_from_arduino(self):
-        line = self.arduino.read_line()
-        if line:
-            print(line)  # For debugging
-            if line.strip() == "0x344":
-                self.main_window.show_settings()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -1,93 +1,91 @@
-# Needed imports for functioning instrument cluster
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout
-from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtCore import Qt
-from PyQt5 import QtCore
 import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout
+from PyQt5.QtGui import QPalette, QColor, QCursor
+from PyQt5.QtCore import Qt, QObject
+from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import json
+import importlib
 
-## Module Imports
-from designs.design_1 import app
-from designs.design_2 import app
-from components.settingsmenu import settings
-#from components.arduino.arduino_serial import ArduinoSerial
+# Ensure the root directory is in the system path
+root_directory = Path(__file__).resolve().parent
+if str(root_directory) not in sys.path:
+    sys.path.insert(0, str(root_directory))
 
-## Import Value Update Fields
-from components.afr.sd_afr_1 import afr_display
-from components.boost.sd_boost_1 import boost_display
-from components.speed.sd_speed_1 import speed_display
-from components.fuel.sd_fuel_1 import fuel_display
-from components.rpm.sd_rpm_1 import rpm_display
-from components.oil.sd_oil_1 import oil_display
-from components.coolant_temp.sd_coolant_1 import coolant_display
-from components.speed.gpsfile import gps
-from components.speed.sd_speed_1  import speed_display
+# Import your settings and other components here
+from components.settingsmenu.settings import Settings
 
-## Disabled for Development Purposing
+class SettingsChangeHandler(QObject, FileSystemEventHandler):
+    def __init__(self, window):
+        super().__init__()
+        self.window = window
 
-# class ValueUpdate:
-#     def __init__(self):
-#         super().__init__()
-#         ## Initialize Serial Connections
-#         self.gps = gps()
-#         self.arduino = ArduinoSerial()   
-#         ## Initial component updates
-#         self.speed_value = Speed.update_speed  
-#         self.afr_value = AFR.update_afr
-#         self.coolant_value = CoolantGauge.update_coolant
-#         self.boost_value = BoostMeter.update_boost
-#         self.oil_value = OilMeter.update_oil_temp
-#         self.fuel_value = FuelMeter.update_fuel
-#         self.rpm_value = RpmMeter.update_rpm
-
-#         ## Initialize Update Refresh Rate
-#         self.timer = QTimer(self)
-#         self.timer.timeout.connect(self.update_arduino_values, self.update_gps_value)
-#         self.timer.start(50)  # Update every 1000 milliseconds (1 second)
-
-#     def update_arduino_values(self):
-#         self.arduino.read_values()
-#         arduino_current_values = self.arduino.current_values
-
-#         if "RPM" in arduino_current_values:
-#             self.rpm_value(arduino_current_values["RPM"])
-#         if "Coolant Temp" in arduino_current_values:
-#             self.coolant_value(arduino_current_values["Coolant Temp"])
-#         if "Boost" in arduino_current_values:
-#             self.boost_value(arduino_current_values["Boost"])  
-#         if "AFR" in arduino_current_values:
-#             self.afr_value(arduino_current_values["AFR"])
-#         if "Oil Temp" in arduino_current_values:
-#             self.oil_value(arduino_current_values["Oil Temp"])
-#         if "Fuel" in arduino_current_values:
-#             self.fuel_value(arduino_current_values["Fuel"])
-    
-#     def update_gps_value(self):
-#         self.gps.read_values()
-#         gps_current_values = self.gps.get_speed
-
-#         if "MPH" in gps_current_values:
-#             self.rpm_value(gps_current_values["MPH"])
+    def on_modified(self, event):
+        if "cluster_settings.json" in event.src_path:
+            print(f"Configuration change detected in {event.src_path}, reloading application")
+            self.window.restart_application()
 
 class MainWindow(QMainWindow):
+    restart_code = 1000
     def __init__(self):
         super().__init__()
-        self.setGeometry(0, 0, 1024, 600)
-        # self.update_values = ValueUpdate()
+        self.setupUI()
 
-        label = QLabel()
-        self.setCentralWidget(label)
-        layout = QGridLayout(label)
-        # self.display = Display()
-        self.display = app()
-        self.display.setAttribute(Qt.WA_TranslucentBackground, True)              
-        layout.addWidget(self.display, 1, 0, 1, 2)  
+    def setupUI(self):
+        print("Application is initializing...")
+        self.setGeometry(0, 0, 1024, 600)
+        self.settings_window = Settings()
+        self.settings_window.setGeometry(0, 0, 1024, 600)
+        self.settings_window.hide()
+
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
+        self.layout = QGridLayout(self.central_widget)
+
         palette = QPalette()
         palette.setColor(QPalette.Background, QColor('black'))
-        self.setPalette(palette)
+        self.central_widget.setPalette(palette)
+
+        self.load_cluster_settings()
+        self.start_watching_settings()
+
+    def load_cluster_settings(self):
+        try:
+            with open('cluster_settings.json', 'r') as file:
+                settings = json.load(file)
+            selected_design = settings.get("selected_design")
+            if selected_design:
+                design_module = importlib.import_module(f'designs.{selected_design}.app')
+                self.display = design_module.instrumentcluster()
+                self.layout.addWidget(self.display, 0, 0)
+                self.display.show()
+        except Exception as e:
+            print("Failed to load settings or design:", e)
+
+    def start_watching_settings(self):
+        event_handler = SettingsChangeHandler(self)
+        self.observer = Observer()
+        self.observer.schedule(event_handler, path='.', recursive=False)
+        self.observer.start()
+
+    def restart_application(self):
+        QApplication.exit(MainWindow.restart_code)
+
+    def closeEvent(self, event):
+        self.observer.stop()
+        self.observer.join()
+        super().closeEvent(event)
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setOverrideCursor(QtCore.Qt.BlankCursor)
-    mainWin = MainWindow()
-    mainWin.show()
-    sys.exit(app.exec_())
+    exit_code = MainWindow.restart_code
+    while exit_code == MainWindow.restart_code:
+        app = QApplication(sys.argv) 
+        palette = QPalette()
+        palette.setColor(QPalette.Window, Qt.black)
+        app.setPalette(palette)
+        QApplication.setOverrideCursor(QCursor(Qt.BlankCursor))
+        mainWindow = MainWindow()
+        mainWindow.show()
+        exit_code = app.exec_()
+        app = None

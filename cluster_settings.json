@@ -1,0 +1,14 @@
+{
+    "max_rpm": 5000,
+    "redline_rpm": 8000,
+    "boost_active": false,
+    "max_boost": 5,
+    "afr_active": false,
+    "current_color_indexes": [
+        0,
+        0,
+        0
+    ],
+    "redline_color_count": 1,
+    "selected_design": "design_1"
+}

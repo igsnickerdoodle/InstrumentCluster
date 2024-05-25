@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
-from __init__ import global_x, global_y
 from pathlib import Path
 import sys
 
@@ -15,10 +14,11 @@ class IndicatorLights(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         ## Initialize Modules
-        self.global_x = global_x
-        self.global_y = global_y
+        self.global_x = 280
+        self.global_y = 50
+        self.text_labels = "Nimbus Sans Bold"
         
-        self.arduino_updater = ArduinoUpdater(self) 
+        # self.arduino_updater = ArduinoUpdater(self) 
 
         self.indicator_light_cel = QLabel(self)
         self.indicator_light_highbeams = QLabel(self)
@@ -130,38 +130,38 @@ class IndicatorLights(QWidget):
         if self.Lturn_on:
             self.Lturn()
 
-class ArduinoUpdater:
-    def __init__(self, indicator_lights):
-        self.indicator_lights = indicator_lights
-        self.arduino = ArduinoReader()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_from_arduino)
-        self.timer.start(100)
+# class ArduinoUpdater:
+#     def __init__(self, indicator_lights):
+#         self.indicator_lights = indicator_lights
+#         self.arduino = ArduinoReader()
+#         self.timer = QTimer()
+#         self.timer.timeout.connect(self.update_from_arduino)
+#         self.timer.start(100)
 
-    def update_from_arduino(self):
-        line = self.arduino.read_line()
-        if line:
-            print(line)  # For debugging
-            if line == "cel_1":
-                self.indicator_lights.cel(True)
-            elif line == "cel_0":
-                self.indicator_lights.cel(False)
-            if line == "hb_1":
-                self.indicator_lights.highbeams(True)
-            elif line == "hb_0":
-                self.indicator_lights.highbeams(False)
-            if line == "fgl_1":
-                self.indicator_lights.foglights(True)
-            elif line == "fgl_0":
-                self.indicator_lights.foglights(False)
-            if line == "rturn_1":
-                self.indicator_lights.Rturn(True)
-            elif line == "rturn_0":
-                self.indicator_lights.Rturn(False)            
-            if line == "lturn_1":
-                self.indicator_lights.Lturn(True)
-            elif line == "lturn_0":
-                self.indicator_lights.Lturn(False)
+#     def update_from_arduino(self):
+#         line = self.arduino.read_line()
+#         if line:
+#             print(line)  # For debugging
+#             if line == "cel_1":
+#                 self.indicator_lights.cel(True)
+#             elif line == "cel_0":
+#                 self.indicator_lights.cel(False)
+#             if line == "hb_1":
+#                 self.indicator_lights.highbeams(True)
+#             elif line == "hb_0":
+#                 self.indicator_lights.highbeams(False)
+#             if line == "fgl_1":
+#                 self.indicator_lights.foglights(True)
+#             elif line == "fgl_0":
+#                 self.indicator_lights.foglights(False)
+#             if line == "rturn_1":
+#                 self.indicator_lights.Rturn(True)
+#             elif line == "rturn_0":
+#                 self.indicator_lights.Rturn(False)            
+#             if line == "lturn_1":
+#                 self.indicator_lights.Lturn(True)
+#             elif line == "lturn_0":
+#                 self.indicator_lights.Lturn(False)
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
