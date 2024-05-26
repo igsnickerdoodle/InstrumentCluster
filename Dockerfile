@@ -35,7 +35,7 @@ WORKDIR /usr/src/app
 
 USER abc
 
-COPY --chown=abc:abc InstrumentCluster/ .
+COPY --chown=abc:abc /var/app/InstrumentCluster/ .
 
 RUN pip3 install --user --no-cache-dir -r requirements.txt
 RUN pip3 install --user PyQt5
