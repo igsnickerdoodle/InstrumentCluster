@@ -8,12 +8,10 @@ from watchdog.events import FileSystemEventHandler
 import json
 import importlib
 
-# Ensure the root directory is in the system path
 root_directory = Path(__file__).resolve().parent
 if str(root_directory) not in sys.path:
     sys.path.insert(0, str(root_directory))
 
-# Import your settings and other components here
 from components.settingsmenu.settings import Settings
 
 class SettingsChangeHandler(QObject, FileSystemEventHandler):

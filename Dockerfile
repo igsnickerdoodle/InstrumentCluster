@@ -5,6 +5,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-dev \
+    arduino \
+    arduino-core \
     build-essential \
     libx11-6 \
     libxcb1 \
@@ -25,23 +27,19 @@ RUN apt-get update && apt-get install -y \
     x11-xserver-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN useradd -m abc
-RUN usermod -a -G 44,105 abc
-# Set the working directory in the container
+RUN useradd -m abc && \
+    usermod -a -G 44,105 abc && \
+    usermod -a -G dialout abc
+
 WORKDIR /usr/src/app
 
-# Switch to the non-root user
 USER abc
 
-# Copy the application source code from your host to the container
 COPY --chown=abc:abc InstrumentCluster/ .
 
-# Install Python dependencies as the non-root user
 RUN pip3 install --user --no-cache-dir -r requirements.txt
 RUN pip3 install --user PyQt5
 
-# Create a startup script to disable screen blanking and run the application
 RUN echo "#!/bin/bash\n\
 xset s off\n\
 xset -dpms\n\
@@ -52,5 +50,4 @@ RUN mkdir -p /tmp/runtime-root && \
     chown abc:abc /tmp/runtime-root && \
     chmod 0700 /tmp/runtime-root
 
-# Command to run on container start
 CMD ["/usr/src/app/start.sh"]

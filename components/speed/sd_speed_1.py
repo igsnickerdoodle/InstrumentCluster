@@ -5,9 +5,9 @@ from pathlib import Path
 from components.speed import update_speed_text
 import sys
 
-current_directory = Path(__file__).parent
-root_directory = current_directory / '..' / '..'
-sys.path.append(str(root_directory.resolve()))
+root_directory = Path(__file__).resolve().parent
+if str(root_directory) not in sys.path:
+    sys.path.insert(0, str(root_directory))
 
 class speed_display(QWidget):
     def __init__(self, parent=None):

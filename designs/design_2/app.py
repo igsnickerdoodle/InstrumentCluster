@@ -6,15 +6,15 @@ from datetime import time
 from pathlib import Path
 import sys
 
-current_directory = Path(__file__).parent
-root_directory = current_directory / '..' / '..'
-sys.path.append(str(root_directory.resolve()))
+root_directory = Path(__file__).resolve().parent
+if str(root_directory) not in sys.path:
+    sys.path.insert(0, str(root_directory))
 
 from components.speed.dd2 import background_speed, speed_widget
 from components.rpm.dd_rpm_2 import background_rpm, rpm_widget
 from components.fuel.dd_fuel_1 import background_fuel, fuel_widget
 from components.coolant_temp.dd_coolant_1 import background_coolant, coolant_temp
-from components.time.dd_time_display import TimeWidget
+from components.time.time_1 import TimeWidget
 
 class instrumentcluster(QWidget):
     def __init__(self, parent=None):
